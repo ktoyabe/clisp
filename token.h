@@ -13,13 +13,18 @@ typedef enum {
 
 typedef struct Token Token;
 
+union token_value {
+    char as_char;
+    int as_int;
+    bool as_bool;
+    String* as_string;
+};
+
 struct Token {
     TokenKind kind;
     Token* next;
     char* str;
-    int ival;
-    bool bval;
-    String* sval;
+    union token_value value;
 };
 
 typedef struct {

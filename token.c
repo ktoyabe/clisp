@@ -8,13 +8,13 @@
 void print_token(FILE* stream, Token* token) {
     switch (token->kind) {
         case TK_RESERVED:
-            fprintf(stream, "%c[RESERVED]", *(token->str));
+            fprintf(stream, "%c[RESERVED]", token->value.as_char);
             return;
         case TK_NUM:
-            fprintf(stream, "%d[NUM]", token->ival);
+            fprintf(stream, "%d[NUM]", token->value.as_int);
             return;
         case TK_STRING:
-            fprintf(stream, "%s[STRING]", token->sval->str);
+            fprintf(stream, "%s[STRING]", token->value.as_string->str);
             return;
         default:
             fprintf(stream, "%s[UNKNOWN]", token->str);
@@ -46,13 +46,15 @@ Token* tokenize(char* p) {
             continue;
         }
         if (is_reserved(*p)) {
-            cur = new_token(TK_RESERVED, cur, p++);
+            cur = new_token(TK_RESERVED, cur, p);
+            cur->value.as_char = *p;
+            p++;
             continue;
         }
 
         if (isdigit(*p)) {
             cur = new_token(TK_NUM, cur, p);
-            cur->ival = strtol(p, &p, 10);
+            cur->value.as_int = strtol(p, &p, 10);
             continue;
         }
 
@@ -65,7 +67,7 @@ Token* tokenize(char* p) {
             size_t len = p - start;
             String* str = new_string_with_len(start, len);
             cur = new_token(TK_STRING, cur, p);
-            cur->sval = str;
+            cur->value.as_string = str;
             continue;
         }
 
