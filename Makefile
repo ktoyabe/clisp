@@ -1,5 +1,5 @@
 
-SRCS = main.c 
+SRCS = main.c common.c token.c cstring.c
 OBJS = $(SRCS:.c=.o)
 CC   = gcc
 CFLAGS = -g

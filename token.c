@@ -1,0 +1,77 @@
+#include "token.h"
+
+#include <ctype.h>
+#include <stdlib.h>
+
+#include "common.h"
+
+void print_token(FILE* stream, Token* token) {
+    switch (token->kind) {
+        case TK_RESERVED:
+            fprintf(stream, "%c[RESERVED]", *(token->str));
+            return;
+        case TK_NUM:
+            fprintf(stream, "%d[NUM]", token->ival);
+            return;
+        case TK_STRING:
+            fprintf(stream, "%s[STRING]", token->sval->str);
+            return;
+        default:
+            fprintf(stream, "%s[UNKNOWN]", token->str);
+            return;
+    }
+}
+
+Token* new_token(TokenKind kind, Token* cur, char* str) {
+    Token* tok = calloc(1, sizeof(Token));
+    tok->kind = kind;
+    tok->str = str;
+    cur->next = tok;
+
+    return tok;
+}
+
+bool is_reserved(char c) {
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')';
+}
+
+Token* tokenize(char* p) {
+    Token head;
+    head.next = NULL;
+    Token* cur = &head;
+
+    while (*p) {
+        if (isspace(*p)) {
+            p++;
+            continue;
+        }
+        if (is_reserved(*p)) {
+            cur = new_token(TK_RESERVED, cur, p++);
+            continue;
+        }
+
+        if (isdigit(*p)) {
+            cur = new_token(TK_NUM, cur, p);
+            cur->ival = strtol(p, &p, 10);
+            continue;
+        }
+
+        // parse string
+        {
+            char* start = p;
+            while (*p && !isspace(*p) && !is_reserved(*p)) {
+                p++;
+            }
+            size_t len = p - start;
+            String* str = new_string_with_len(start, len);
+            cur = new_token(TK_STRING, cur, p);
+            cur->sval = str;
+            continue;
+        }
+
+        error("failed to tokenize. input=%s", p);
+    }
+
+    new_token(TK_EOF, cur, p);
+    return head.next;
+}
