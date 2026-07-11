@@ -5,16 +5,16 @@
 
 #include "cstring.h"
 #include "lexer.h"
+#include "parser.h"
 
 int main(int argc, char** argv) {
-    char* input = "(+ 1 2)";
+    char* input = " (+ (- 2 4) (* (+ 5 6) 4))";
     Token* tokens = tokenize(input);
+    print_tokens(stdout, tokens);
+    printf("-----------------\n");
+    Parser* parser = new_parser(tokens);
+    ObjectNode* objs = parse(parser);
+    print_objs(stdout, objs);
 
-    Token* t = tokens;
-    while (t->kind != TK_EOF) {
-        print_token(stdout, t);
-        printf("\n");
-        t = t->next;
-    }
     return 0;
 }

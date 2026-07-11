@@ -4,6 +4,8 @@
 #include "cstring.h"
 
 typedef enum {
+    TK_LPAREN,    // (
+    TK_RPAREN,    // )
     TK_RESERVED,  // 記号
     TK_NUM,       // 数値
     TK_BOOL,      // boolean
@@ -32,4 +34,6 @@ typedef struct {
 } Tokenizer;
 
 void print_token(FILE* stream, Token* token);
+void print_tokens(FILE* stream, Token* tokens);
+
 Token* tokenize(char* p);

@@ -1,5 +1,5 @@
 
-SRCS = main.c common.c lexer.c cstring.c
+SRCS = main.c common.c lexer.c cstring.c object.c parser.c
 OBJS = $(SRCS:.c=.o)
 CC   = gcc
 CFLAGS = -g

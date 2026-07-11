@@ -7,6 +7,12 @@
 
 void print_token(FILE* stream, Token* token) {
     switch (token->kind) {
+        case TK_LPAREN:
+            fprintf(stream, "%c[LPAREN]", token->value.as_char);
+            return;
+        case TK_RPAREN:
+            fprintf(stream, "%c[RPAREN]", token->value.as_char);
+            return;
         case TK_RESERVED:
             fprintf(stream, "%c[RESERVED]", token->value.as_char);
             return;
@@ -22,6 +28,15 @@ void print_token(FILE* stream, Token* token) {
     }
 }
 
+void print_tokens(FILE* stream, Token* tokens) {
+    Token* t = tokens;
+    while (t->kind != TK_EOF) {
+        print_token(stream, t);
+        fprintf(stream, "\n");
+        t = t->next;
+    }
+}
+
 Token* new_token(TokenKind kind, Token* cur, char* str) {
     Token* tok = calloc(1, sizeof(Token));
     tok->kind = kind;
@@ -32,7 +47,7 @@ Token* new_token(TokenKind kind, Token* cur, char* str) {
 }
 
 bool is_reserved(char c) {
-    return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')';
+    return c == '+' || c == '-' || c == '*' || c == '/';
 }
 
 Token* tokenize(char* p) {
@@ -42,6 +57,18 @@ Token* tokenize(char* p) {
 
     while (*p) {
         if (isspace(*p)) {
+            p++;
+            continue;
+        }
+        if (*p == '(') {
+            cur = new_token(TK_LPAREN, cur, p);
+            cur->value.as_char = *p;
+            p++;
+            continue;
+        }
+        if (*p == ')') {
+            cur = new_token(TK_RPAREN, cur, p);
+            cur->value.as_char = *p;
             p++;
             continue;
         }
