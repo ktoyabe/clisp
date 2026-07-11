@@ -43,15 +43,17 @@ void read_input(InputBuffer* input_buffer) {
     input_buffer->buffer[bytes_read - 1] = '\0';
 }
 
-void eval_object(char* input) {
+void eval_object(char* input, Env* env) {
     Token* tokens = tokenize(input);
+    // print_tokens(stdout, tokens);
     Parser* parser = new_parser(tokens);
     ObjectNode* objs = parse(parser);
-    Object* result = eval_list(objs);
+    Object* result = eval_list(objs, env);
     print_obj(stdout, result, 0);
 }
 
 int main(int argc, char** argv) {
+    Env* global_env = newEnv();
     InputBuffer* input_buffer = new_input_buffer();
     while (true) {
         print_prompt();
@@ -61,7 +63,7 @@ int main(int argc, char** argv) {
             break;
         }
 
-        eval_object(input_buffer->buffer);
+        eval_object(input_buffer->buffer, global_env);
     }
 
     free_input_buffer(input_buffer);

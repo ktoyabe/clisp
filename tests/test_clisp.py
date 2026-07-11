@@ -2,7 +2,7 @@ import subprocess
 import pytest # type: ignore
 
 def run_script(commands):
-    if len(commands) == 1:
+    if commands[-1] != "exit":
         commands.append("exit")
     input_data = "\n".join(commands) + "\n"
 
@@ -128,6 +128,34 @@ def test_multi_objs():
     result = run_script(["(+ (- 2 4) (* 3 5))"])
     expected = [
         "clisp> 13",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_define_variable_and_use_it():
+    result = run_script([
+        "(define a 1)",
+        "(define b 3)",
+        "(+ a b)"])
+    expected = [
+        "clisp> [VOID]",
+        "clisp> [VOID]",
+        "clisp> 4",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_redefine_variable():
+    result = run_script([
+        "(define a 1)",
+        "(+ a 2)",
+        "(define a 3)",
+        "(+ a 2)"])
+    expected = [
+        "clisp> [VOID]",
+        "clisp> 3",
+        "clisp> [VOID]",
+        "clisp> 5",
         "clisp> ",
     ]
     assert result == expected

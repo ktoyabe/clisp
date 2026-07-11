@@ -2,7 +2,9 @@
 
 #include "common.h"
 
-Object* eval_obj(Object* obj) {
+Object* eval_symbol(Object* obj, Env* env);
+
+Object* eval_obj(Object* obj, Env* env) {
     switch (obj->kind) {
         case OK_VOID:
             return new_object(OK_VOID);
@@ -12,8 +14,11 @@ Object* eval_obj(Object* obj) {
         case OK_INTEGER: {
             return new_int_object(obj->value.as_int);
         }
+        case OK_SYMBOL: {
+            return eval_symbol(obj, env);
+        }
         case OK_LIST: {
-            return eval_list(obj->value.as_list);
+            return eval_list(obj->value.as_list, env);
         }
         default: {
             error("Unsupported ObjectKind.");
@@ -21,13 +26,13 @@ Object* eval_obj(Object* obj) {
     }
 }
 
-Object* eval_binary_op(ObjectNode* objs) {
+Object* eval_binary_op(ObjectNode* objs, Env* env) {
     Object* operator = objs->content;
     ObjectNode* lhs = objs->next;
-    Object* lhs_val = eval_obj(lhs->content);
+    Object* lhs_val = eval_obj(lhs->content, env);
 
     ObjectNode* rhs = lhs->next;
-    Object* rhs_val = eval_obj(rhs->content);
+    Object* rhs_val = eval_obj(rhs->content, env);
 
     switch (operator->value.as_char) {
         case '+': {
@@ -65,32 +70,57 @@ Object* eval_binary_op(ObjectNode* objs) {
     }
 }
 
-Object* eval_if(ObjectNode* objs) {
+Object* eval_if(ObjectNode* objs, Env* env) {
     ObjectNode* cond_obj = objs->next;
     ObjectNode* true_stmt_obj = cond_obj->next;
     ObjectNode* false_stmt_obj = true_stmt_obj->next;
 
-    Object* cond = eval_obj(cond_obj->content);
+    Object* cond = eval_obj(cond_obj->content, env);
     if (cond->kind != OK_BOOL) {
         error("Condition must be a bool");
     }
 
     if (cond->value.as_bool) {
-        return eval_obj(true_stmt_obj->content);
+        return eval_obj(true_stmt_obj->content, env);
     } else {
-        return eval_obj(false_stmt_obj->content);
+        return eval_obj(false_stmt_obj->content, env);
     }
 }
 
-Object* eval_list(ObjectNode* objs) {
+Object* eval_define(ObjectNode* objs, Env* env) {
+    ObjectNode* symbol_node = objs->next;
+    ObjectNode* value_node = symbol_node->next;
+
+    if (symbol_node->content->kind != OK_SYMBOL) {
+        error("symbol node must be OK_SYBOL");
+    }
+    String* key = symbol_node->content->value.as_symbol;
+    Object* value = value_node->content;
+    env_set(env, key, value);
+
+    return new_object(OK_VOID);
+}
+
+Object* eval_symbol(Object* obj, Env* env) {
+    Object* value = env_get(env, obj->value.as_symbol);
+    if (!value) {
+        error("Undefined symbol. symbol=%s", obj->value.as_symbol);
+    }
+    return value;
+}
+
+Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
         case OK_RESERVED: {
-            return eval_binary_op(objs);
+            return eval_binary_op(objs, env);
         }
         case OK_SYMBOL: {
-            if (string_eq(head->value.as_symbol, "if")) {
-                return eval_if(objs);
+            if (string_chars_eq(head->value.as_symbol, "if")) {
+                return eval_if(objs, env);
+            }
+            if (string_chars_eq(head->value.as_symbol, "define")) {
+                return eval_define(objs, env);
             }
         }
         default: {

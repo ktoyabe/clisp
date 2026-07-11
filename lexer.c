@@ -51,6 +51,8 @@ bool is_reserved(char c) {
            c == '<' || c == '=';
 }
 
+bool is_parents(char c) { return c == '(' || c == ')'; }
+
 Token* tokenize(char* p) {
     Token head;
     head.next = NULL;
@@ -96,7 +98,7 @@ Token* tokenize(char* p) {
         // parse string
         {
             char* start = p;
-            while (*p && !isspace(*p) && !is_reserved(*p)) {
+            while (*p && !isspace(*p) && !is_reserved(*p) && !is_parents(*p)) {
                 p++;
             }
             size_t len = p - start;

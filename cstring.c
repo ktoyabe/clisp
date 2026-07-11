@@ -22,4 +22,10 @@ String* new_string_with_len(char* src, size_t len) {
     return val;
 }
 
-bool string_eq(String* lhs, char* rhs) { return strcmp(lhs->str, rhs) == 0; }
+bool string_eq(String* lhs, String* rhs) {
+    return strcmp(lhs->str, rhs->str) == 0;
+}
+
+bool string_chars_eq(String* lhs, char* rhs) {
+    return strcmp(lhs->str, rhs) == 0;
+}
