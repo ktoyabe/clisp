@@ -1,5 +1,5 @@
 import subprocess
-import pytest
+import pytest # type: ignore
 
 def run_script(commands):
     if len(commands) == 1:
@@ -55,6 +55,70 @@ def test_minus_int():
     result = run_script(["(+ -2 1)"])
     expected = [
         "clisp> -1",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_less_than_is_true():
+    result = run_script(["(< -2 1)"])
+    expected = [
+        "clisp> true",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_less_than_is_false():
+    result = run_script(["(< 1 0)"])
+    expected = [
+        "clisp> false",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_greater_than_is_true():
+    result = run_script(["(> 1 -2)"])
+    expected = [
+        "clisp> true",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_greater_than_is_false():
+    result = run_script(["(> 0 1)"])
+    expected = [
+        "clisp> false",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_eq_is_true():
+    result = run_script(["(= -2 -2)"])
+    expected = [
+        "clisp> true",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_eq_is_false():
+    result = run_script(["(= 0 1)"])
+    expected = [
+        "clisp> false",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_if_execute_true_stmt():
+    result = run_script(["(if (< 1 2) 3 4)"])
+    expected = [
+        "clisp> 3",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_if_execute_false_stmt():
+    result = run_script(["(if (> 1 2) 3 4)"])
+    expected = [
+        "clisp> 4",
         "clisp> ",
     ]
     assert result == expected

@@ -37,7 +37,8 @@ void print_obj(FILE* stream, Object* obj, int indent) {
             fprintf(stream, "%*s\n", indent, "[VOID]");
             return;
         case OK_BOOL:
-            fprintf(stream, "%*c\n", indent, obj->value.as_bool);
+            fprintf(stream, "%*s\n", indent,
+                    obj->value.as_bool ? "true" : "false");
             return;
         case OK_INTEGER:
             fprintf(stream, "%*d\n", indent, obj->value.as_int);

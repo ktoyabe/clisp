@@ -47,7 +47,8 @@ Token* new_token(TokenKind kind, Token* cur, char* str) {
 }
 
 bool is_reserved(char c) {
-    return c == '+' || c == '-' || c == '*' || c == '/';
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '>' ||
+           c == '<' || c == '=';
 }
 
 Token* tokenize(char* p) {

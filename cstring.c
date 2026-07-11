@@ -21,3 +21,5 @@ String* new_string_with_len(char* src, size_t len) {
 
     return val;
 }
+
+bool string_eq(String* lhs, char* rhs) { return strcmp(lhs->str, rhs) == 0; }

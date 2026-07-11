@@ -46,10 +46,39 @@ Object* eval_binary_op(ObjectNode* objs) {
             return new_int_object(lhs_val->value.as_int /
                                   rhs_val->value.as_int);
         }
+        case '>': {
+            return new_bool_object(lhs_val->value.as_int >
+                                   rhs_val->value.as_int);
+        }
+        case '<': {
+            return new_bool_object(lhs_val->value.as_int <
+                                   rhs_val->value.as_int);
+        }
+        case '=': {
+            return new_bool_object(lhs_val->value.as_int ==
+                                   rhs_val->value.as_int);
+        }
         default: {
             error("eval_binary_op: unsupported operator '%c'",
                   operator->value.as_char);
         }
+    }
+}
+
+Object* eval_if(ObjectNode* objs) {
+    ObjectNode* cond_obj = objs->next;
+    ObjectNode* true_stmt_obj = cond_obj->next;
+    ObjectNode* false_stmt_obj = true_stmt_obj->next;
+
+    Object* cond = eval_obj(cond_obj->content);
+    if (cond->kind != OK_BOOL) {
+        error("Condition must be a bool");
+    }
+
+    if (cond->value.as_bool) {
+        return eval_obj(true_stmt_obj->content);
+    } else {
+        return eval_obj(false_stmt_obj->content);
     }
 }
 
@@ -58,6 +87,11 @@ Object* eval_list(ObjectNode* objs) {
     switch (head->kind) {
         case OK_RESERVED: {
             return eval_binary_op(objs);
+        }
+        case OK_SYMBOL: {
+            if (string_eq(head->value.as_symbol, "if")) {
+                return eval_if(objs);
+            }
         }
         default: {
             error("eval_list: Unsupported ObjectKind");

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -10,3 +11,5 @@ typedef struct {
 
 String* new_string(char* src);
 String* new_string_with_len(char* src, size_t len);
+
+bool string_eq(String* lhs, char* rhs);
