@@ -35,6 +35,8 @@ struct Object {
 };
 
 Object* new_object(ObjectKind kind);
+Object* new_int_object(int val);
+Object* new_bool_object(bool val);
 
 struct ObjectNode {
     Object* content;
