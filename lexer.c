@@ -72,7 +72,14 @@ Token* tokenize(char* p) {
             p++;
             continue;
         }
+        if (*p == '-' && isdigit(*(p + 1))) {  // parse as minus integer
+            p++;
+            cur = new_token(TK_NUM, cur, p);
+            cur->value.as_int = -strtol(p, &p, 10);
+            continue;
+        }
         if (is_reserved(*p)) {
+            // parse as reserved charactor
             cur = new_token(TK_RESERVED, cur, p);
             cur->value.as_char = *p;
             p++;

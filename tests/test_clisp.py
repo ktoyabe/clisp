@@ -51,6 +51,14 @@ def test_div_two_elem():
     ]
     assert result == expected
 
+def test_minus_int():
+    result = run_script(["(+ -2 1)"])
+    expected = [
+        "clisp> -1",
+        "clisp> ",
+    ]
+    assert result == expected
+
 
 def test_multi_objs():
     result = run_script(["(+ (- 2 4) (* 3 5))"])
