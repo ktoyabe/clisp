@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "cstring.h"
-#include "token.h"
+#include "lexer.h"
 
 int main(int argc, char** argv) {
     char* input = "(+ 1 2)";

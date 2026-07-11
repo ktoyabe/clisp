@@ -1,5 +1,5 @@
 
-SRCS = main.c common.c token.c cstring.c
+SRCS = main.c common.c lexer.c cstring.c
 OBJS = $(SRCS:.c=.o)
 CC   = gcc
 CFLAGS = -g
@@ -17,7 +17,7 @@ run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f $(TARGET) $(OBJS) *.db
+	rm -f $(TARGET) $(OBJS)
 
 test: $(TARGET)
 	uv run pytest
