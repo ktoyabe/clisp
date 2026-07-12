@@ -253,6 +253,17 @@ Object* eval_function_definition(ObjectNode* objs, Env* env) {
     return o;
 }
 
+Object* eval_print(ObjectNode* objs, Env* env) {
+    ObjectNode* node = objs->next;
+    while (node->content->kind != OK_EOF) {
+        Object* o = eval_obj(node->content, env);
+        print_obj(stdout, o, 0);
+        node = node->next;
+    }
+    Object* ret = new_object(OK_VOID);
+    return ret;
+}
+
 Object* eval_function_call(ObjectNode* objs, Env* env) {
     String* function_name = objs->content->value.as_symbol;
     Object* lambda = env_get(env, function_name);
@@ -305,6 +316,9 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             }
             if (string_chars_eq(head->value.as_symbol, "lambda")) {
                 return eval_function_definition(objs, env);
+            }
+            if (string_chars_eq(head->value.as_symbol, "print")) {
+                return eval_print(objs, env);
             }
             return eval_function_call(objs, env);
         }

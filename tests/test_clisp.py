@@ -421,3 +421,27 @@ def test_binary_op_int_vs_float():
         'clisp> ',
     ]
     assert result == expected
+
+def test_print():
+    result = run_script([
+        '(define a 1)',
+        '(define b #f)',
+        '(define c 1.0)',
+        '(define d "abc")',
+        '(print a)',
+        '(print b c d)',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> 1',
+        '[VOID]',
+        'clisp> #f',
+        '1.0000',
+        '"abc"',
+        '[VOID]',
+        'clisp> ',
+    ]
+    assert result == expected
