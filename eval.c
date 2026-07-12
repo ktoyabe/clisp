@@ -2,22 +2,30 @@
 
 #include "common.h"
 
+const char* OK_VOID_STR = "OK_VOID";
+const char* OK_INTEGER_STR = "OK_INTEGER";
+const char* OK_RESERVED_STR = "OK_RESERVED";
+const char* OK_BOOL_STR = "OK_BOOL";
+const char* OK_SYMBOL_STR = "OK_SYMBOL";
+const char* OK_LAMBDA_STR = "OK_LAMBDA";
+const char* OK_LIST_STR = "OK_LIST";
+
 const char* ObjectKind_to_str(ObjectKind kind) {
     switch (kind) {
         case OK_VOID:
-            return "OK_VOID";
+            return OK_VOID_STR;
         case OK_INTEGER:
-            return "OK_INTEGER";
+            return OK_INTEGER_STR;
         case OK_RESERVED:
-            return "OK_RESERVED";
+            return OK_RESERVED_STR;
         case OK_BOOL:
-            return "OK_BOOL";
+            return OK_BOOL_STR;
         case OK_SYMBOL:
-            return "OK_SYMBOL";
+            return OK_SYMBOL_STR;
         case OK_LAMBDA:
-            return "OK_LAMBDA";
+            return OK_LAMBDA_STR;
         case OK_LIST:
-            return "OK_LIST";
+            return OK_LIST_STR;
     }
 }
 
@@ -165,21 +173,25 @@ Object* eval_binary_op(ObjectNode* objs, Env* env) {
                                     (double)lhs_val->value.as_int,
                                     rhs_val->value.as_float);
     }
-
-    switch (operator->value.as_char) {
-        case '|': {
-            return new_bool_object(lhs_val->value.as_bool ||
-                                   rhs_val->value.as_bool);
-        }
-        case '&': {
-            return new_bool_object(lhs_val->value.as_bool &&
-                                   rhs_val->value.as_bool);
-        }
-        default: {
-            error("eval_binary_op: unsupported operator '%c'",
-                  operator->value.as_char);
+    if (lhs_kind == OK_BOOL && rhs_kind == OK_BOOL) {
+        switch (operator->value.as_char) {
+            case '|': {
+                return new_bool_object(lhs_val->value.as_bool ||
+                                       rhs_val->value.as_bool);
+            }
+            case '&': {
+                return new_bool_object(lhs_val->value.as_bool &&
+                                       rhs_val->value.as_bool);
+            }
+            default: {
+                error("eval_binary_op: unsupported operator '%c'",
+                      operator->value.as_char);
+            }
         }
     }
+    error("unsupported binary_operator. op=%c, lhs_type=%s, rhs_type=%s",
+          operator->value.as_char, ObjectKind_to_str(lhs_kind),
+          ObjectKind_to_str(rhs_kind));
 }
 
 Object* eval_if(ObjectNode* objs, Env* env) {
