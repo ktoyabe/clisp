@@ -2,33 +2,6 @@
 
 #include "common.h"
 
-const char* OK_VOID_STR = "OK_VOID";
-const char* OK_INTEGER_STR = "OK_INTEGER";
-const char* OK_RESERVED_STR = "OK_RESERVED";
-const char* OK_BOOL_STR = "OK_BOOL";
-const char* OK_SYMBOL_STR = "OK_SYMBOL";
-const char* OK_LAMBDA_STR = "OK_LAMBDA";
-const char* OK_LIST_STR = "OK_LIST";
-
-const char* ObjectKind_to_str(ObjectKind kind) {
-    switch (kind) {
-        case OK_VOID:
-            return OK_VOID_STR;
-        case OK_INTEGER:
-            return OK_INTEGER_STR;
-        case OK_RESERVED:
-            return OK_RESERVED_STR;
-        case OK_BOOL:
-            return OK_BOOL_STR;
-        case OK_SYMBOL:
-            return OK_SYMBOL_STR;
-        case OK_LAMBDA:
-            return OK_LAMBDA_STR;
-        case OK_LIST:
-            return OK_LIST_STR;
-    }
-}
-
 Object* eval_symbol(Object* obj, Env* env);
 
 Object* eval_obj(Object* obj, Env* env) {
@@ -311,6 +284,24 @@ Object* eval_symbol(Object* obj, Env* env) {
     return value;
 }
 
+Object* eval_list_data(ObjectNode* objs, Env* env) {
+    ObjectNode head;
+    head.next = NULL;
+    ObjectNode* tail = &head;
+
+    ObjectNode* cur = objs->next;  // skip list symbol node
+    while (cur) {
+        Object* o = eval_obj(cur->content, env);
+        tail = new_node(tail, o);
+        cur = cur->next;
+    }
+
+    Object* o = new_object(OK_LIST);
+    o->value.as_list = head.next;
+
+    return o;
+}
+
 Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
@@ -329,6 +320,9 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             }
             if (string_chars_eq(head->value.as_symbol, "print")) {
                 return eval_print(objs, env);
+            }
+            if (string_chars_eq(head->value.as_symbol, "list")) {
+                return eval_list_data(objs, env);
             }
             return eval_function_call(objs, env);
         }

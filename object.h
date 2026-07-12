@@ -21,6 +21,8 @@ typedef enum {
     OK_LIST,
 } ObjectKind;
 
+const char* ObjectKind_to_str(ObjectKind kind);
+
 struct StringNode {
     String* value;
     StringNode* next;

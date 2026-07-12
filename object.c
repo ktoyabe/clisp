@@ -2,6 +2,33 @@
 
 #include <stdlib.h>
 
+static const char* OK_VOID_STR = "OK_VOID";
+static const char* OK_INTEGER_STR = "OK_INTEGER";
+static const char* OK_RESERVED_STR = "OK_RESERVED";
+static const char* OK_BOOL_STR = "OK_BOOL";
+static const char* OK_SYMBOL_STR = "OK_SYMBOL";
+static const char* OK_LAMBDA_STR = "OK_LAMBDA";
+static const char* OK_LIST_STR = "OK_LIST";
+
+const char* ObjectKind_to_str(ObjectKind kind) {
+    switch (kind) {
+        case OK_VOID:
+            return OK_VOID_STR;
+        case OK_INTEGER:
+            return OK_INTEGER_STR;
+        case OK_RESERVED:
+            return OK_RESERVED_STR;
+        case OK_BOOL:
+            return OK_BOOL_STR;
+        case OK_SYMBOL:
+            return OK_SYMBOL_STR;
+        case OK_LAMBDA:
+            return OK_LAMBDA_STR;
+        case OK_LIST:
+            return OK_LIST_STR;
+    }
+}
+
 StringNode* newStringNode(StringNode* cur, String* value) {
     StringNode* node = (StringNode*)calloc(1, sizeof(StringNode));
     node->value = value;
@@ -50,46 +77,69 @@ ObjectNode* new_node(ObjectNode* cur, Object* object) {
     return node;
 }
 
-void print_obj(FILE* stream, Object* obj, int indent) {
+void print_obj_raw(FILE* stream, Object* obj) {
     switch (obj->kind) {
         case OK_RESERVED:
-            fprintf(stream, "%*c\n", indent, obj->value.as_char);
+            fprintf(stream, "%c", obj->value.as_char);
             return;
         case OK_VOID:
-            fprintf(stream, "%*s\n", indent, "[VOID]");
+            fprintf(stream, "%s", "[VOID]");
             return;
         case OK_BOOL:
-            fprintf(stream, "%*s\n", indent,
-                    (obj->value.as_bool ? "#t" : "#f"));
+            fprintf(stream, "%s", (obj->value.as_bool ? "#t" : "#f"));
             return;
         case OK_INTEGER:
-            fprintf(stream, "%*d\n", indent, obj->value.as_int);
+            fprintf(stream, "%d", obj->value.as_int);
             return;
         case OK_FLOAT:
-            fprintf(stream, "%.4lf\n", obj->value.as_float);
+            fprintf(stream, "%.4lf", obj->value.as_float);
             return;
         case OK_SYMBOL:
-            fprintf(stream, "%*s\n", indent, obj->value.as_symbol->str);
+            fprintf(stream, "%s", obj->value.as_symbol->str);
             return;
         case OK_STRING:
-            fprintf(stream, "\"%*s\"\n", indent, obj->value.as_string->str);
+            fprintf(stream, "\"%s\"", obj->value.as_string->str);
             return;
-        case OK_LIST: {
-            int new_indent = indent + 4;
-            ObjectNode* cur = obj->value.as_list;
-            while (cur) {
-                print_obj(stream, cur->content, new_indent);
-                cur = cur->next;
-            }
-            return;
-        }
         case OK_LAMBDA:
-            fprintf(stream, "%*s\n", indent, "[LAMBDA]");
+            fprintf(stream, "%s", "[LAMBDA]");
             return;
         default:
-            fprintf(stream, "UnknownKind");
+            fprintf(stream, "UnknownKind. kind=%s",
+                    ObjectKind_to_str(obj->kind));
             return;
     }
+}
+
+void print_obj_list(FILE* stream, Object* obj) {
+    ObjectNode* node = obj->value.as_list;
+    ObjectNode* cur = node;
+
+    fprintf(stream, "(");
+    int i = 0;
+    while (cur) {
+        if (i > 0) {
+            fprintf(stream, " ");
+        }
+        print_obj_raw(stream, cur->content);
+        cur = cur->next;
+        i++;
+    }
+    fprintf(stream, ")");
+}
+
+void print_obj(FILE* stream, Object* obj, int indent) {
+    fprintf(stream, "%*s", indent, "");
+    switch (obj->kind) {
+        case OK_LIST: {
+            print_obj_list(stream, obj);
+            break;
+        }
+        default: {
+            print_obj_raw(stream, obj);
+            break;
+        }
+    }
+    fprintf(stream, "\n");
 }
 
 void print_objs(FILE* stream, ObjectNode* objs) {

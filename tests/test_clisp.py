@@ -445,3 +445,25 @@ def test_print():
         'clisp> ',
     ]
     assert result == expected
+
+def test_list():
+    result = run_script([
+        '(define a 1)',
+        '(list a 3 4)'
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> (1 3 4)',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_empty_list():
+    result = run_script([
+        '(list )'
+        ])
+    expected = [
+        'clisp> ()',
+        'clisp> ',
+    ]
+    assert result == expected
