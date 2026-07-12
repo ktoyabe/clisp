@@ -48,7 +48,7 @@ Token* new_token(TokenKind kind, Token* cur, char* str) {
 
 bool is_reserved(char c) {
     return c == '+' || c == '-' || c == '*' || c == '/' || c == '>' ||
-           c == '<' || c == '=' || c == '|' || c == '&';
+           c == '<' || c == '%' || c == '=' || c == '|' || c == '&';
 }
 
 bool is_parents(char c) { return c == '(' || c == ')'; }

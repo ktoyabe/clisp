@@ -73,6 +73,10 @@ Object* eval_binary_op(ObjectNode* objs, Env* env) {
             return new_int_object(lhs_val->value.as_int /
                                   rhs_val->value.as_int);
         }
+        case '%': {
+            return new_int_object(lhs_val->value.as_int %
+                                  rhs_val->value.as_int);
+        }
         case '>': {
             return new_bool_object(lhs_val->value.as_int >
                                    rhs_val->value.as_int);

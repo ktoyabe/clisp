@@ -288,3 +288,21 @@ def test_bool_op_and():
         "clisp> ",
     ]
     assert result == expected
+
+def test_modulo_operator():
+    result = run_script([
+        "(% 0 3)",
+        "(% 1 3)",
+        "(% 2 3)",
+        "(% 3 3)",
+        "(% 4 3)",
+        ])
+    expected = [
+        "clisp> 0",
+        "clisp> 1",
+        "clisp> 2",
+        "clisp> 0",
+        "clisp> 1",
+        "clisp> ",
+    ]
+    assert result == expected
