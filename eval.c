@@ -18,8 +18,6 @@ const char* ObjectKind_to_str(ObjectKind kind) {
             return "OK_LAMBDA";
         case OK_LIST:
             return "OK_LIST";
-        case OK_EOF:
-            return "OK_EOF";
     }
 }
 
@@ -219,7 +217,7 @@ StringNode* eval_params_define(ObjectNode* params, Env* env) {
     ObjectNode* param = params;
     StringNode head;
     StringNode* cur = &head;
-    while (param->content->kind != OK_EOF) {
+    while (param) {
         if (param->content->kind != OK_SYMBOL) {
             error("params object kind must be symbol.");
         }
@@ -255,7 +253,7 @@ Object* eval_function_definition(ObjectNode* objs, Env* env) {
 
 Object* eval_print(ObjectNode* objs, Env* env) {
     ObjectNode* node = objs->next;
-    while (node->content->kind != OK_EOF) {
+    while (node) {
         Object* o = eval_obj(node->content, env);
         print_obj(stdout, o, 0);
         node = node->next;
@@ -276,7 +274,7 @@ Object* eval_function_call(ObjectNode* objs, Env* env) {
     Env* function_scope = env_extend(env);
     ObjectNode* param = objs->next;
     StringNode* name = lambda->value.as_lambda->params;
-    while (param->content->kind != OK_EOF) {
+    while (param) {
         Object* val = eval_obj(param->content, env);
         env_set(function_scope, name->value, val);
         param = param->next;

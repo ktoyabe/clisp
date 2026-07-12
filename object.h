@@ -19,7 +19,6 @@ typedef enum {
     OK_STRING,
     OK_LAMBDA,
     OK_LIST,
-    OK_EOF,
 } ObjectKind;
 
 struct StringNode {

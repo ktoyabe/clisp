@@ -5,7 +5,7 @@
 
 String* new_string(char* src) {
     size_t len = strlen(src);
-    String* val = (String*)malloc(sizeof(String));
+    String* val = (String*)calloc(1, sizeof(String));
     val->str = (char*)malloc(len + 1);
     val->len = len;
     strncpy(val->str, src, len);
@@ -14,7 +14,7 @@ String* new_string(char* src) {
 }
 
 String* new_string_with_len(char* src, size_t len) {
-    String* val = (String*)malloc(sizeof(String));
+    String* val = (String*)calloc(1, sizeof(String));
     val->str = (char*)malloc(len + 1);
     val->len = len;
     strncpy(val->str, src, len);

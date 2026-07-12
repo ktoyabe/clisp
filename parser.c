@@ -67,7 +67,6 @@ ObjectNode* parse_impl(Parser* parser) {
                 continue;
             }
             case TK_RPAREN: {
-                new_node(cur, new_object(OK_EOF));
                 consume(parser);
                 return head.next;
             }

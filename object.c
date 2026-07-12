@@ -3,16 +3,15 @@
 #include <stdlib.h>
 
 StringNode* newStringNode(StringNode* cur, String* value) {
-    StringNode* node = (StringNode*)malloc(sizeof(StringNode));
+    StringNode* node = (StringNode*)calloc(1, sizeof(StringNode));
     node->value = value;
-    node->next = NULL;
     cur->next = node;
 
     return node;
 }
 
 ObjectLambda* newObjectLambda(StringNode* params, ObjectNode* body) {
-    ObjectLambda* o = (ObjectLambda*)malloc(sizeof(ObjectLambda));
+    ObjectLambda* o = (ObjectLambda*)calloc(1, sizeof(ObjectLambda));
     o->params = params;
     o->body = body;
 
@@ -78,7 +77,7 @@ void print_obj(FILE* stream, Object* obj, int indent) {
         case OK_LIST: {
             int new_indent = indent + 4;
             ObjectNode* cur = obj->value.as_list;
-            while (cur->content->kind != OK_EOF) {
+            while (cur) {
                 print_obj(stream, cur->content, new_indent);
                 cur = cur->next;
             }
@@ -96,7 +95,7 @@ void print_obj(FILE* stream, Object* obj, int indent) {
 void print_objs(FILE* stream, ObjectNode* objs) {
     ObjectNode* cur = objs;
     int indent = 0;
-    while (cur->content->kind != OK_EOF) {
+    while (cur) {
         print_obj(stream, cur->content, indent);
         cur = cur->next;
     }

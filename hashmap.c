@@ -11,10 +11,8 @@ HashMap* new_hash_map() {
 
 hash_map_entry_node* add_entry(hash_map_entry_node* cur, HashMapEntry* entry) {
     hash_map_entry_node* node =
-        (hash_map_entry_node*)malloc(sizeof(hash_map_entry_node));
+        (hash_map_entry_node*)calloc(1, sizeof(hash_map_entry_node));
     node->entry = entry;
-    node->next = NULL;
-
     cur->next = node;
 
     return node;
