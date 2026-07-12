@@ -14,3 +14,5 @@ String* new_string_with_len(char* src, size_t len);
 
 bool string_eq(String* lhs, String* rhs);
 bool string_chars_eq(String* lhs, char* rhs);
+
+String* string_concat(String* lhs, String* rhs);

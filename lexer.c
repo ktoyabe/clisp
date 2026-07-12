@@ -20,8 +20,10 @@ void print_token(FILE* stream, Token* token) {
             fprintf(stream, "%d[NUM]", token->value.as_int);
             return;
         case TK_SYMBOL:
-            fprintf(stream, "%s[STRING]", token->value.as_symbol->str);
+            fprintf(stream, "%s[SYMBOL]", token->value.as_symbol->str);
             return;
+        case TK_STRING:
+            fprintf(stream, "%s[STRING]", token->value.as_string->str);
         default:
             fprintf(stream, "%s[UNKNOWN]", token->str);
             return;
@@ -110,6 +112,20 @@ Token* tokenize(char* p) {
                 p++;
                 continue;
             }
+        }
+
+        if (*p == '"') {  // parse string
+            p++;          // skip '"'
+            char* start = p;
+            while (*p && *p != '"') {
+                p++;
+            }
+            size_t len = p - start;
+            String* str = new_string_with_len(start, len);
+            cur = new_token(TK_STRING, cur, p);
+            cur->value.as_string = str;
+            p++;  // skip '"'
+            continue;
         }
 
         // parse symbol

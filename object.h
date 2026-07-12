@@ -15,6 +15,7 @@ typedef enum {
     OK_INTEGER,
     OK_BOOL,
     OK_SYMBOL,
+    OK_STRING,
     OK_LAMBDA,
     OK_LIST,
     OK_EOF,
@@ -39,6 +40,7 @@ typedef union {
     int as_int;
     bool as_bool;
     String* as_symbol;
+    String* as_string;
     ObjectLambda* as_lambda;
     ObjectNode* as_list;
 } ObjectValue;

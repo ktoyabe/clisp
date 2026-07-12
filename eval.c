@@ -38,12 +38,65 @@ Object* eval_obj(Object* obj, Env* env) {
         case OK_SYMBOL: {
             return eval_symbol(obj, env);
         }
+        case OK_STRING: {
+            Object* o = new_object(OK_STRING);
+            o->value.as_string = obj->value.as_string;
+            return o;
+        }
         case OK_LIST: {
             return eval_list(obj->value.as_list, env);
         }
         default: {
             error("Unsupported ObjectKind. kind=%s",
                   ObjectKind_to_str(obj->kind));
+        }
+    }
+}
+
+Object* eval_binary_op_int(char op, int lhs, int rhs) {
+    switch (op) {
+        case '+': {
+            return new_int_object(lhs + rhs);
+        }
+        case '-': {
+            return new_int_object(lhs - rhs);
+        }
+        case '*': {
+            return new_int_object(lhs * rhs);
+        }
+        case '/': {
+            return new_int_object(lhs / rhs);
+        }
+        case '%': {
+            return new_int_object(lhs % rhs);
+        }
+        case '>': {
+            return new_bool_object(lhs > rhs);
+        }
+        case '<': {
+            return new_bool_object(lhs < rhs);
+        }
+        case '=': {
+            return new_bool_object(lhs == rhs);
+        }
+        default: {
+            error("eval_binary_op_int: unsupported operator '%c'", op);
+        }
+    }
+}
+
+Object* eval_binary_op_string(char op, String* lhs, String* rhs) {
+    switch (op) {
+        case '+': {
+            Object* o = new_object(OK_STRING);
+            o->value.as_string = string_concat(lhs, rhs);
+            return o;
+        }
+        case '=': {
+            return new_bool_object(string_eq(lhs, rhs));
+        }
+        default: {
+            error("eval_binary_op_string: unsupported operator '%c'", op);
         }
     }
 }
@@ -56,39 +109,16 @@ Object* eval_binary_op(ObjectNode* objs, Env* env) {
     ObjectNode* rhs = lhs->next;
     Object* rhs_val = eval_obj(rhs->content, env);
 
+    if (lhs_val->kind == OK_INTEGER && rhs_val->kind == OK_INTEGER) {
+        return eval_binary_op_int(operator->value.as_char,
+                                  lhs_val->value.as_int, rhs_val->value.as_int);
+    }
+    if (lhs_val->kind == OK_STRING && rhs_val->kind == OK_STRING) {
+        return eval_binary_op_string(operator->value.as_char,
+                                     lhs_val->value.as_string,
+                                     rhs_val->value.as_string);
+    }
     switch (operator->value.as_char) {
-        case '+': {
-            return new_int_object(lhs_val->value.as_int +
-                                  rhs_val->value.as_int);
-        }
-        case '-': {
-            return new_int_object(lhs_val->value.as_int -
-                                  rhs_val->value.as_int);
-        }
-        case '*': {
-            return new_int_object(lhs_val->value.as_int *
-                                  rhs_val->value.as_int);
-        }
-        case '/': {
-            return new_int_object(lhs_val->value.as_int /
-                                  rhs_val->value.as_int);
-        }
-        case '%': {
-            return new_int_object(lhs_val->value.as_int %
-                                  rhs_val->value.as_int);
-        }
-        case '>': {
-            return new_bool_object(lhs_val->value.as_int >
-                                   rhs_val->value.as_int);
-        }
-        case '<': {
-            return new_bool_object(lhs_val->value.as_int <
-                                   rhs_val->value.as_int);
-        }
-        case '=': {
-            return new_bool_object(lhs_val->value.as_int ==
-                                   rhs_val->value.as_int);
-        }
         case '|': {
             return new_bool_object(lhs_val->value.as_bool ||
                                    rhs_val->value.as_bool);
@@ -229,8 +259,7 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             return eval_function_call(objs, env);
         }
         default: {
-            error("eval_list: Unsupported ObjectKind. kind=%s",
-                  ObjectKind_to_str(head->kind));
+            return eval_obj(head, env);
         }
     }
 }

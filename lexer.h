@@ -10,6 +10,7 @@ typedef enum {
     TK_NUM,       // 数値
     TK_BOOL,      // boolean
     TK_SYMBOL,    // シンボル(!= 文字列)
+    TK_STRING,    // 文字列
     TK_EOF,
 } TokenKind;
 
@@ -20,6 +21,7 @@ union token_value {
     int as_int;
     bool as_bool;
     String* as_symbol;
+    String* as_string;
 };
 
 struct Token {

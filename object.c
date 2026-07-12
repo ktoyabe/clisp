@@ -63,6 +63,9 @@ void print_obj(FILE* stream, Object* obj, int indent) {
         case OK_SYMBOL:
             fprintf(stream, "%*s\n", indent, obj->value.as_symbol->str);
             return;
+        case OK_STRING:
+            fprintf(stream, "\"%*s\"\n", indent, obj->value.as_string->str);
+            return;
         case OK_LIST: {
             int new_indent = indent + 4;
             ObjectNode* cur = obj->value.as_list;

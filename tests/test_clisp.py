@@ -306,3 +306,37 @@ def test_modulo_operator():
         "clisp> ",
     ]
     assert result == expected
+
+def test_string_concat():
+    result = run_script([
+        '(+ "ab" "cde")',
+        '(+ "ab" "")',
+        '(+ "" "cde")',
+        ])
+    expected = [
+        'clisp> "abcde"',
+        'clisp> "ab"',
+        'clisp> "cde"',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_string_equal():
+    result = run_script([
+        '(= "ab" "cde")',
+        '(= "ab" "cd")',
+        '(= "ab" "ab")',
+        '(= "ab" "")',
+        '(= "" "ab")',
+        '(= "" "")',
+        ])
+    expected = [
+        'clisp> #f',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> ',
+    ]
+    assert result == expected

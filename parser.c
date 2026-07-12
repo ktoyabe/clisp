@@ -47,6 +47,13 @@ ObjectNode* parse_impl(Parser* parser) {
                 consume(parser);
                 continue;
             }
+            case TK_STRING: {
+                Object* o = new_object(OK_STRING);
+                o->value.as_string = parser->token->value.as_string;
+                cur = new_node(cur, o);
+                consume(parser);
+                continue;
+            }
             case TK_BOOL: {
                 Object* o = new_bool_object(parser->token->value.as_bool);
                 cur = new_node(cur, o);
