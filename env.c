@@ -10,7 +10,7 @@ Env* newEnv() {
     return env;
 }
 
-Env* extend(Env* parent) {
+Env* env_extend(Env* parent) {
     Env* env = newEnv();
     env->parent = parent;
 }

@@ -2,6 +2,23 @@
 
 #include <stdlib.h>
 
+StringNode* newStringNode(StringNode* cur, String* value) {
+    StringNode* node = (StringNode*)malloc(sizeof(StringNode));
+    node->value = value;
+    node->next = NULL;
+    cur->next = node;
+
+    return node;
+}
+
+ObjectLambda* newObjectLambda(StringNode* params, ObjectNode* body) {
+    ObjectLambda* o = (ObjectLambda*)malloc(sizeof(ObjectLambda));
+    o->params = params;
+    o->body = body;
+
+    return o;
+}
+
 Object* new_object(ObjectKind kind) {
     Object* obj = calloc(1, sizeof(Object));
     obj->kind = kind;
@@ -42,6 +59,9 @@ void print_obj(FILE* stream, Object* obj, int indent) {
             return;
         case OK_INTEGER:
             fprintf(stream, "%*d\n", indent, obj->value.as_int);
+            return;
+        case OK_SYMBOL:
+            fprintf(stream, "%*s\n", indent, obj->value.as_symbol->str);
             return;
         case OK_LIST: {
             int new_indent = indent + 4;

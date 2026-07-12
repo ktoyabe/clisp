@@ -6,6 +6,8 @@
 #include "cstring.h"
 
 typedef struct Object Object;
+typedef struct ObjectNode ObjectNode;
+typedef struct StringNode StringNode;
 
 typedef enum {
     OK_VOID,
@@ -18,14 +20,26 @@ typedef enum {
     OK_EOF,
 } ObjectKind;
 
-typedef struct ObjectNode ObjectNode;
+struct StringNode {
+    String* value;
+    StringNode* next;
+};
+
+StringNode* newStringNode(StringNode* cur, String* value);
+
+typedef struct {
+    StringNode* params;
+    ObjectNode* body;
+} ObjectLambda;
+
+ObjectLambda* newObjectLambda(StringNode* cur, ObjectNode* body);
 
 typedef union {
     char as_char;
     int as_int;
     bool as_bool;
     String* as_symbol;
-    void* as_lambda;
+    ObjectLambda* as_lambda;
     ObjectNode* as_list;
 } ObjectValue;
 

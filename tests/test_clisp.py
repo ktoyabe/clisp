@@ -159,3 +159,67 @@ def test_redefine_variable():
         "clisp> ",
     ]
     assert result == expected
+
+def test_define_when_value_node_include_variable():
+    result = run_script([
+        "(define a 3)",
+        "(define b (+ 1 a))",
+        "(+ b 1)"])
+    expected = [
+        "clisp> [VOID]",
+        "clisp> [VOID]",
+        "clisp> 5",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_function_call_wo_variable_capture():
+    result = run_script([
+        "(define f (lambda (x) (+ x 1)))",
+        "(f 2)"])
+    expected = [
+        "clisp> [VOID]",
+        "clisp> 3",
+        "clisp> ",
+    ]
+    assert result == expected
+
+
+def test_function_call_two_args_wo_variable_capture():
+    result = run_script([
+        "(define f (lambda (x y) (/ x y)))",
+        "(f 4 3)"])
+    expected = [
+        "clisp> [VOID]",
+        "clisp> 1",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_function_call_two_args_wo_variable_capture_with_variable_args():
+    result = run_script([
+        "(define a 1)",
+        "(define b 3)",
+        "(define f (lambda (x y) (+ x y)))",
+        "(f (* a 1) (* b 2))"])
+    expected = [
+        "clisp> [VOID]",
+        "clisp> [VOID]",
+        "clisp> [VOID]",
+        "clisp> 7",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_function_call_with_variable_capture():
+    result = run_script([
+        "(define a 1)",
+        "(define f (lambda (x) (+ x a)))",
+        "(f 3)"])
+    expected = [
+        "clisp> [VOID]",
+        "clisp> [VOID]",
+        "clisp> 4",
+        "clisp> ",
+    ]
+    assert result == expected

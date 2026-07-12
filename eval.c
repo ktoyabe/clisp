@@ -2,6 +2,27 @@
 
 #include "common.h"
 
+const char* ObjectKind_to_str(ObjectKind kind) {
+    switch (kind) {
+        case OK_VOID:
+            return "OK_VOID";
+        case OK_INTEGER:
+            return "OK_INTEGER";
+        case OK_RESERVED:
+            return "OK_RESERVED";
+        case OK_BOOL:
+            return "OK_BOOL";
+        case OK_SYMBOL:
+            return "OK_SYMBOL";
+        case OK_LAMBDA:
+            return "OK_LAMBDA";
+        case OK_LIST:
+            return "OK_LIST";
+        case OK_EOF:
+            return "OK_EOF";
+    }
+}
+
 Object* eval_symbol(Object* obj, Env* env);
 
 Object* eval_obj(Object* obj, Env* env) {
@@ -21,7 +42,8 @@ Object* eval_obj(Object* obj, Env* env) {
             return eval_list(obj->value.as_list, env);
         }
         default: {
-            error("Unsupported ObjectKind.");
+            error("Unsupported ObjectKind. kind=%s",
+                  ObjectKind_to_str(obj->kind));
         }
     }
 }
@@ -95,10 +117,77 @@ Object* eval_define(ObjectNode* objs, Env* env) {
         error("symbol node must be OK_SYBOL");
     }
     String* key = symbol_node->content->value.as_symbol;
-    Object* value = value_node->content;
+    Object* value = eval_obj(value_node->content, env);
     env_set(env, key, value);
 
     return new_object(OK_VOID);
+}
+
+StringNode* eval_params_define(ObjectNode* params, Env* env) {
+    ObjectNode* param = params;
+    StringNode head;
+    StringNode* cur = &head;
+    while (param->content->kind != OK_EOF) {
+        if (param->content->kind != OK_SYMBOL) {
+            error("params object kind must be symbol.");
+        }
+        cur = newStringNode(cur, param->content->value.as_symbol);
+        param = param->next;
+    }
+
+    return head.next;
+}
+
+Object* eval_function_definition(ObjectNode* objs, Env* env) {
+    ObjectNode* params_node = objs->next;
+    if (!params_node) {
+        error("eval_function_define: params_node must not be null.");
+    }
+    if (params_node->content->kind != OK_LIST) {
+        error("params_node must be OK_LIST.");
+    }
+    StringNode* params =
+        eval_params_define(params_node->content->value.as_list, env);
+
+    ObjectNode* body_node = params_node->next;
+    if (!body_node) {
+        error("eval_function_define: body_node must not be null.");
+    }
+
+    ObjectLambda* lambda = newObjectLambda(params, body_node);
+    Object* o = new_object(OK_LAMBDA);
+    o->value.as_lambda = lambda;
+
+    return o;
+}
+
+Object* eval_function_call(ObjectNode* objs, Env* env) {
+    String* function_name = objs->content->value.as_symbol;
+    Object* lambda = env_get(env, function_name);
+    if (!lambda) {
+        error("undefined function. name=%s", function_name->str);
+    }
+    if (lambda->kind != OK_LAMBDA) {
+        error("Not a lambda object.");
+    }
+    Env* function_scope = env_extend(env);
+    ObjectNode* param = objs->next;
+    StringNode* name = lambda->value.as_lambda->params;
+    while (param->content->kind != OK_EOF) {
+        Object* val = eval_obj(param->content, env);
+        env_set(function_scope, name->value, val);
+        param = param->next;
+        name = name->next;
+    }
+    ObjectNode* body = lambda->value.as_lambda->body;
+    if (body->content->kind != OK_LIST) {
+        error("lambda body type must be OK_LIST. type=%s",
+              ObjectKind_to_str(body->content->kind));
+    }
+    Object* ret = eval_list(body->content->value.as_list, function_scope);
+    // TODO: free function_scope object
+
+    return ret;
 }
 
 Object* eval_symbol(Object* obj, Env* env) {
@@ -122,9 +211,14 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             if (string_chars_eq(head->value.as_symbol, "define")) {
                 return eval_define(objs, env);
             }
+            if (string_chars_eq(head->value.as_symbol, "lambda")) {
+                return eval_function_definition(objs, env);
+            }
+            return eval_function_call(objs, env);
         }
         default: {
-            error("eval_list: Unsupported ObjectKind");
+            error("eval_list: Unsupported ObjectKind. kind=%s",
+                  ObjectKind_to_str(head->kind));
         }
     }
 }
