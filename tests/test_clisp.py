@@ -62,7 +62,7 @@ def test_minus_int():
 def test_less_than_is_true():
     result = run_script(["(< -2 1)"])
     expected = [
-        "clisp> true",
+        "clisp> #t",
         "clisp> ",
     ]
     assert result == expected
@@ -70,7 +70,7 @@ def test_less_than_is_true():
 def test_less_than_is_false():
     result = run_script(["(< 1 0)"])
     expected = [
-        "clisp> false",
+        "clisp> #f",
         "clisp> ",
     ]
     assert result == expected
@@ -78,7 +78,7 @@ def test_less_than_is_false():
 def test_greater_than_is_true():
     result = run_script(["(> 1 -2)"])
     expected = [
-        "clisp> true",
+        "clisp> #t",
         "clisp> ",
     ]
     assert result == expected
@@ -86,7 +86,7 @@ def test_greater_than_is_true():
 def test_greater_than_is_false():
     result = run_script(["(> 0 1)"])
     expected = [
-        "clisp> false",
+        "clisp> #f",
         "clisp> ",
     ]
     assert result == expected
@@ -94,7 +94,7 @@ def test_greater_than_is_false():
 def test_eq_is_true():
     result = run_script(["(= -2 -2)"])
     expected = [
-        "clisp> true",
+        "clisp> #t",
         "clisp> ",
     ]
     assert result == expected
@@ -102,7 +102,7 @@ def test_eq_is_true():
 def test_eq_is_false():
     result = run_script(["(= 0 1)"])
     expected = [
-        "clisp> false",
+        "clisp> #f",
         "clisp> ",
     ]
     assert result == expected
@@ -252,6 +252,39 @@ def test_function_recursive_call_fact():
         "clisp> 1",
         "clisp> 2",
         "clisp> 120",
+        "clisp> ",
+    ]
+    assert result == expected
+
+
+def test_bool_op_or():
+    result = run_script([
+        "(| #f #f)",
+        "(| #t #f)",
+        "(| #f #t)",
+        "(| #t #t)",
+        ])
+    expected = [
+        "clisp> #f",
+        "clisp> #t",
+        "clisp> #t",
+        "clisp> #t",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_bool_op_and():
+    result = run_script([
+        "(& #f #f)",
+        "(& #t #f)",
+        "(& #f #t)",
+        "(& #t #t)",
+        ])
+    expected = [
+        "clisp> #f",
+        "clisp> #f",
+        "clisp> #f",
+        "clisp> #t",
         "clisp> ",
     ]
     assert result == expected

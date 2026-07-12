@@ -48,7 +48,7 @@ Token* new_token(TokenKind kind, Token* cur, char* str) {
 
 bool is_reserved(char c) {
     return c == '+' || c == '-' || c == '*' || c == '/' || c == '>' ||
-           c == '<' || c == '=';
+           c == '<' || c == '=' || c == '|' || c == '&';
 }
 
 bool is_parents(char c) { return c == '(' || c == ')'; }
@@ -93,6 +93,23 @@ Token* tokenize(char* p) {
             cur = new_token(TK_NUM, cur, p);
             cur->value.as_int = strtol(p, &p, 10);
             continue;
+        }
+
+        if (*p == '#') {
+            char next = *(p + 1);
+            if (next == 't') {
+                cur = new_token(TK_BOOL, cur, p);
+                cur->value.as_bool = true;
+                p++;
+                p++;
+                continue;
+            } else if (next == 'f') {
+                cur = new_token(TK_BOOL, cur, p);
+                cur->value.as_bool = false;
+                p++;
+                p++;
+                continue;
+            }
         }
 
         // parse symbol

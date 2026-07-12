@@ -85,6 +85,14 @@ Object* eval_binary_op(ObjectNode* objs, Env* env) {
             return new_bool_object(lhs_val->value.as_int ==
                                    rhs_val->value.as_int);
         }
+        case '|': {
+            return new_bool_object(lhs_val->value.as_bool ||
+                                   rhs_val->value.as_bool);
+        }
+        case '&': {
+            return new_bool_object(lhs_val->value.as_bool &&
+                                   rhs_val->value.as_bool);
+        }
         default: {
             error("eval_binary_op: unsupported operator '%c'",
                   operator->value.as_char);

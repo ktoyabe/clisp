@@ -47,6 +47,12 @@ ObjectNode* parse_impl(Parser* parser) {
                 consume(parser);
                 continue;
             }
+            case TK_BOOL: {
+                Object* o = new_bool_object(parser->token->value.as_bool);
+                cur = new_node(cur, o);
+                consume(parser);
+                continue;
+            }
             case TK_RPAREN: {
                 new_node(cur, new_object(OK_EOF));
                 consume(parser);
