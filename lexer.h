@@ -9,7 +9,7 @@ typedef enum {
     TK_RESERVED,  // 記号
     TK_NUM,       // 数値
     TK_BOOL,      // boolean
-    TK_STRING,    // 文字列
+    TK_SYMBOL,    // シンボル(!= 文字列)
     TK_EOF,
 } TokenKind;
 
@@ -19,7 +19,7 @@ union token_value {
     char as_char;
     int as_int;
     bool as_bool;
-    String* as_string;
+    String* as_symbol;
 };
 
 struct Token {

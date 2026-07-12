@@ -40,9 +40,9 @@ ObjectNode* parse_impl(Parser* parser) {
                 consume(parser);
                 continue;
             }
-            case TK_STRING: {
+            case TK_SYMBOL: {
                 Object* o = new_object(OK_SYMBOL);
-                o->value.as_symbol = parser->token->value.as_string;
+                o->value.as_symbol = parser->token->value.as_symbol;
                 cur = new_node(cur, o);
                 consume(parser);
                 continue;

@@ -19,8 +19,8 @@ void print_token(FILE* stream, Token* token) {
         case TK_NUM:
             fprintf(stream, "%d[NUM]", token->value.as_int);
             return;
-        case TK_STRING:
-            fprintf(stream, "%s[STRING]", token->value.as_string->str);
+        case TK_SYMBOL:
+            fprintf(stream, "%s[STRING]", token->value.as_symbol->str);
             return;
         default:
             fprintf(stream, "%s[UNKNOWN]", token->str);
@@ -95,7 +95,7 @@ Token* tokenize(char* p) {
             continue;
         }
 
-        // parse string
+        // parse symbol
         {
             char* start = p;
             while (*p && !isspace(*p) && !is_reserved(*p) && !is_parents(*p)) {
@@ -103,8 +103,8 @@ Token* tokenize(char* p) {
             }
             size_t len = p - start;
             String* str = new_string_with_len(start, len);
-            cur = new_token(TK_STRING, cur, p);
-            cur->value.as_string = str;
+            cur = new_token(TK_SYMBOL, cur, p);
+            cur->value.as_symbol = str;
             continue;
         }
 
