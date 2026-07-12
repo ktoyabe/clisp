@@ -31,6 +31,12 @@ Object* new_int_object(int val) {
     return o;
 }
 
+Object* new_float_object(double val) {
+    Object* o = new_object(OK_FLOAT);
+    o->value.as_float = val;
+    return o;
+}
+
 Object* new_bool_object(bool val) {
     Object* o = new_object(OK_BOOL);
     o->value.as_bool = val;
@@ -59,6 +65,9 @@ void print_obj(FILE* stream, Object* obj, int indent) {
             return;
         case OK_INTEGER:
             fprintf(stream, "%*d\n", indent, obj->value.as_int);
+            return;
+        case OK_FLOAT:
+            fprintf(stream, "%.4lf\n", obj->value.as_float);
             return;
         case OK_SYMBOL:
             fprintf(stream, "%*s\n", indent, obj->value.as_symbol->str);

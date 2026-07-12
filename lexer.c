@@ -55,6 +55,22 @@ bool is_reserved(char c) {
 
 bool is_parents(char c) { return c == '(' || c == ')'; }
 
+Token* tokenize_number(char** p, Token* cur) {
+    char* q = *p;
+    int int_val = strtol(q, &q, 10);
+    if (*q != '.') {  // parse as integer
+        cur = new_token(TK_NUM, cur, *p);
+        cur->value.as_int = int_val;
+        *p = q;
+        return cur;
+    } else {  // parse as float
+        cur = new_token(TK_FLOAT, cur, *p);
+        double val = (double)strtof(*p, &(*p));
+        cur->value.as_float = val;
+        return cur;
+    }
+}
+
 Token* tokenize(char* p) {
     Token head;
     head.next = NULL;
@@ -79,8 +95,12 @@ Token* tokenize(char* p) {
         }
         if (*p == '-' && isdigit(*(p + 1))) {  // parse as minus integer
             p++;
-            cur = new_token(TK_NUM, cur, p);
-            cur->value.as_int = -strtol(p, &p, 10);
+            cur = tokenize_number(&p, cur);
+            if (cur->kind == TK_NUM) {
+                cur->value.as_int *= -1;
+            } else if (cur->kind == TK_FLOAT) {
+                cur->value.as_float *= -1;
+            }
             continue;
         }
         if (is_reserved(*p)) {
@@ -92,8 +112,7 @@ Token* tokenize(char* p) {
         }
 
         if (isdigit(*p)) {
-            cur = new_token(TK_NUM, cur, p);
-            cur->value.as_int = strtol(p, &p, 10);
+            cur = tokenize_number(&p, cur);
             continue;
         }
 

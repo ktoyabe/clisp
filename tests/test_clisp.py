@@ -340,3 +340,84 @@ def test_string_equal():
         'clisp> ',
     ]
     assert result == expected
+
+def test_float_binary_op():
+    result = run_script([
+        '(+ -1.1 2.3)',
+        '(+ 1.1 -2.3)',
+        '(+ 1.1 2.3)',
+        '(- 1.1 2.3)',
+        '(* 1.1 2.3)',
+        '(/ 1.1 2.2)',
+        '(> 1.1 2.2)',
+        '(< 1.1 2.2)',
+        '(= 1.1 2.2)',
+        '(= 1.1 1.1)',
+        ])
+    expected = [
+        'clisp> 1.2000',
+        'clisp> -1.2000',
+        'clisp> 3.4000',
+        'clisp> -1.2000',
+        'clisp> 2.5300',
+        'clisp> 0.5000',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_binary_op_float_vs_int():
+    result = run_script([
+        '(+ -1.1 2)',
+        '(+ 1.1 2)',
+        '(- 1.1 2)',
+        '(* 1.1 2)',
+        '(/ 1.1 2)',
+        '(> 1.1 2)',
+        '(< 1.1 2)',
+        '(= 1.1 2)',
+        '(= 1.00 1)',
+        ])
+    expected = [
+        'clisp> 0.9000',
+        'clisp> 3.1000',
+        'clisp> -0.9000',
+        'clisp> 2.2000',
+        'clisp> 0.5500',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> ',
+    ]
+    assert result == expected
+
+
+def test_binary_op_int_vs_float():
+    result = run_script([
+        '(+ 2 -2.5)',
+        '(+ 2 2.5)',
+        '(- 2 2.5)',
+        '(* 2 2.5)',
+        '(/ 2 2.5)',
+        '(> 2 2.5)',
+        '(< 2 2.5)',
+        '(= 2 2.5)',
+        '(= 2 2.00)',
+        ])
+    expected = [
+        'clisp> -0.5000',
+        'clisp> 4.5000',
+        'clisp> -0.5000',
+        'clisp> 5.0000',
+        'clisp> 0.8000',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> ',
+    ]
+    assert result == expected

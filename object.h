@@ -13,6 +13,7 @@ typedef enum {
     OK_VOID,
     OK_RESERVED,
     OK_INTEGER,
+    OK_FLOAT,
     OK_BOOL,
     OK_SYMBOL,
     OK_STRING,
@@ -38,6 +39,7 @@ ObjectLambda* newObjectLambda(StringNode* cur, ObjectNode* body);
 typedef union {
     char as_char;
     int as_int;
+    double as_float;
     bool as_bool;
     String* as_symbol;
     String* as_string;
@@ -52,6 +54,7 @@ struct Object {
 
 Object* new_object(ObjectKind kind);
 Object* new_int_object(int val);
+Object* new_float_object(double val);
 Object* new_bool_object(bool val);
 
 struct ObjectNode {

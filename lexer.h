@@ -7,7 +7,8 @@ typedef enum {
     TK_LPAREN,    // (
     TK_RPAREN,    // )
     TK_RESERVED,  // 記号
-    TK_NUM,       // 数値
+    TK_NUM,       // int
+    TK_FLOAT,     // float
     TK_BOOL,      // boolean
     TK_SYMBOL,    // シンボル(!= 文字列)
     TK_STRING,    // 文字列
@@ -19,6 +20,7 @@ typedef struct Token Token;
 union token_value {
     char as_char;
     int as_int;
+    double as_float;
     bool as_bool;
     String* as_symbol;
     String* as_string;

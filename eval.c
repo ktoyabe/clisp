@@ -35,6 +35,9 @@ Object* eval_obj(Object* obj, Env* env) {
         case OK_INTEGER: {
             return new_int_object(obj->value.as_int);
         }
+        case OK_FLOAT: {
+            return new_float_object(obj->value.as_float);
+        }
         case OK_SYMBOL: {
             return eval_symbol(obj, env);
         }
@@ -85,6 +88,35 @@ Object* eval_binary_op_int(char op, int lhs, int rhs) {
     }
 }
 
+Object* eval_binary_op_float(char op, double lhs, double rhs) {
+    switch (op) {
+        case '+': {
+            return new_float_object(lhs + rhs);
+        }
+        case '-': {
+            return new_float_object(lhs - rhs);
+        }
+        case '*': {
+            return new_float_object(lhs * rhs);
+        }
+        case '/': {
+            return new_float_object(lhs / rhs);
+        }
+        case '>': {
+            return new_bool_object(lhs > rhs);
+        }
+        case '<': {
+            return new_bool_object(lhs < rhs);
+        }
+        case '=': {
+            return new_bool_object(lhs == rhs);
+        }
+        default: {
+            error("eval_binary_op_int: unsupported operator '%c'", op);
+        }
+    }
+}
+
 Object* eval_binary_op_string(char op, String* lhs, String* rhs) {
     switch (op) {
         case '+': {
@@ -105,19 +137,37 @@ Object* eval_binary_op(ObjectNode* objs, Env* env) {
     Object* operator = objs->content;
     ObjectNode* lhs = objs->next;
     Object* lhs_val = eval_obj(lhs->content, env);
+    ObjectKind lhs_kind = lhs_val->kind;
 
     ObjectNode* rhs = lhs->next;
     Object* rhs_val = eval_obj(rhs->content, env);
+    ObjectKind rhs_kind = rhs_val->kind;
 
-    if (lhs_val->kind == OK_INTEGER && rhs_val->kind == OK_INTEGER) {
+    if (lhs_kind == OK_INTEGER && rhs_kind == OK_INTEGER) {
         return eval_binary_op_int(operator->value.as_char,
                                   lhs_val->value.as_int, rhs_val->value.as_int);
     }
-    if (lhs_val->kind == OK_STRING && rhs_val->kind == OK_STRING) {
+    if (lhs_kind == OK_STRING && rhs_kind == OK_STRING) {
         return eval_binary_op_string(operator->value.as_char,
                                      lhs_val->value.as_string,
                                      rhs_val->value.as_string);
     }
+    if (lhs_kind == OK_FLOAT && rhs_kind == OK_FLOAT) {
+        return eval_binary_op_float(operator->value.as_char,
+                                    lhs_val->value.as_float,
+                                    rhs_val->value.as_float);
+    }
+    if (lhs_kind == OK_FLOAT && rhs_kind == OK_INTEGER) {
+        return eval_binary_op_float(operator->value.as_char,
+                                    lhs_val->value.as_float,
+                                    (double)rhs_val->value.as_int);
+    }
+    if (lhs_kind == OK_INTEGER && rhs_kind == OK_FLOAT) {
+        return eval_binary_op_float(operator->value.as_char,
+                                    (double)lhs_val->value.as_int,
+                                    rhs_val->value.as_float);
+    }
+
     switch (operator->value.as_char) {
         case '|': {
             return new_bool_object(lhs_val->value.as_bool ||
