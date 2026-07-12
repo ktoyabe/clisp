@@ -223,3 +223,35 @@ def test_function_call_with_variable_capture():
         "clisp> ",
     ]
     assert result == expected
+
+def test_function_recursive_call_fib():
+    result = run_script([
+        "(define fib (lambda (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2))))))",
+        "(fib 1)",
+        "(fib 2)",
+        "(fib 10)",
+        ])
+    expected = [
+        "clisp> [VOID]",
+        "clisp> 1",
+        "clisp> 2",
+        "clisp> 89",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_function_recursive_call_fact():
+    result = run_script([
+        "(define fact (lambda (n) (if (< n 2) 1 (* n (fact (- n 1))))))",
+        "(fact 1)",
+        "(fact 2)",
+        "(fact 5)",
+        ])
+    expected = [
+        "clisp> [VOID]",
+        "clisp> 1",
+        "clisp> 2",
+        "clisp> 120",
+        "clisp> ",
+    ]
+    assert result == expected
