@@ -645,3 +645,34 @@ def test_length():
         'clisp> ',
     ]
     assert result == expected
+
+
+def test_range():
+    result = run_script([
+        '(range 0 4 2)',
+        '(range 0 4 4)',
+        '(range 0 0 1)',
+        ])
+    expected = [
+        'clisp> (0 2)',
+        'clisp> (0)',
+        'clisp> ()',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_range_with_vars():
+    result = run_script([
+        '(define begin 3)',
+        '(define end 10)',
+        '(define step 2)',
+        '(range begin end step)',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> (3 5 7 9)',
+        'clisp> ',
+    ]
+    assert result == expected

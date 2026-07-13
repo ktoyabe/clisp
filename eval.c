@@ -368,6 +368,22 @@ object_result pickup_list_object(ObjectNode* list_node, Env* env) {
     return ObjectOk(list);
 }
 
+object_result pickup_int_object(ObjectNode* node, Env* env) {
+    if (!node) {
+        char msg[ERROR_MSG_LEN];
+        sprintf(msg, "node is null.");
+        return ObjectErr(msg);
+    }
+    Object* o = eval_obj(node->content, env);
+    if (o->kind != OK_INTEGER) {
+        char msg[ERROR_MSG_LEN];
+        sprintf(msg, "object type must be int. kind=%s",
+                ObjectKind_to_str(o->kind));
+        return ObjectErr(msg);
+    }
+    return ObjectOk(o);
+}
+
 Object* eval_map(ObjectNode* objs, Env* env) {
     ObjectNode* func_node = objs->next;
     object_result result = pickup_lambda_object(func_node, env);
@@ -530,6 +546,37 @@ Object* eval_length(ObjectNode* objs, Env* env) {
     return new_int_object(len);
 }
 
+Object* eval_range(ObjectNode* objs, Env* env) {
+    ObjectNode* begin_node = objs->next;
+    object_result result = pickup_int_object(begin_node, env);
+    if (result.error_msg) {
+        error("eval_range at begin_node: %s", result.error_msg);
+    }
+    int begin = result.object->value.as_int;
+
+    ObjectNode* end_node = begin_node->next;
+    result = pickup_int_object(end_node, env);
+    int end = result.object->value.as_int;
+
+    ObjectNode* step_node = end_node->next;
+    result = pickup_int_object(step_node, env);
+    int step = result.object->value.as_int;
+
+    if (step_node->next) {
+        error("eval_range input length error.");
+    }
+    ObjectNode head;
+    head.next = NULL;
+    ObjectNode* tail = &head;
+    for (int i = begin; i < end; i += step) {
+        Object* o = new_int_object(i);
+        tail = new_node(tail, o);
+    }
+    Object* list = new_object(OK_LIST);
+    list->value.as_list = head.next;
+    return list;
+}
+
 Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
@@ -563,6 +610,9 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             }
             if (string_chars_eq(head->value.as_symbol, "length")) {
                 return eval_length(objs, env);
+            }
+            if (string_chars_eq(head->value.as_symbol, "range")) {
+                return eval_range(objs, env);
             }
             return eval_function_call(objs, env);
         }
