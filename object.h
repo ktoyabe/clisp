@@ -29,6 +29,7 @@ struct StringNode {
 };
 
 StringNode* newStringNode(StringNode* cur, String* value);
+size_t StringNode_len(StringNode* cur);
 
 typedef struct {
     StringNode* params;

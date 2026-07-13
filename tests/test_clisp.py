@@ -488,3 +488,41 @@ def test_list_concat():
         'clisp> ',
     ]
     assert result == expected
+
+def test_map():
+    result = run_script([
+        '(define l (list 2 3))',
+        '(define addr (lambda (x) (+ x 1)))',
+        '(map addr l)',
+        '(map (lambda (x) (* x x)) l)',
+        '(map addr (list 4 5))',
+        '(map (lambda (x) (+ x 1)) (list 1 2))',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> (3 4)',
+        'clisp> (4 9)',
+        'clisp> (5 6)',
+        'clisp> (2 3)',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_map_apply_empty_list():
+    result = run_script([
+        '(define l (list))',
+        '(define addr (lambda (x) (+ x 1)))',
+        '(map addr l)',
+        '(map addr (list))',
+        '(map (lambda (x) (* x x)) (list))',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> ()',
+        'clisp> ()',
+        'clisp> ()',
+        'clisp> ',
+    ]
+    assert result == expected

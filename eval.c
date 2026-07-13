@@ -313,6 +313,56 @@ Object* eval_list_data(ObjectNode* objs, Env* env) {
     return o;
 }
 
+Object* eval_map(ObjectNode* objs, Env* env) {
+    ObjectNode* op = objs;
+    ObjectNode* func_node = op->next;
+    if (!func_node) {
+        error("eval_map: function node is null.");
+    }
+    Object* func_obj = eval_obj(func_node->content, env);
+    if (!func_obj || func_obj->kind != OK_LAMBDA) {
+        error("eval_map: function object kind must be Lambda. kind=%s",
+              ObjectKind_to_str(func_node->content->kind));
+    }
+    ObjectLambda* lambda = func_obj->value.as_lambda;
+    size_t args_len = StringNode_len(lambda->params);
+    if (args_len != 1) {
+        error("eval_map: function args length must be 1. len=%d", args_len);
+    }
+
+    ObjectNode* list_node = func_node->next;
+    if (!list_node) {
+        error("eval_map: list node is null.");
+    }
+    Object* list = eval_obj(list_node->content, env);
+    if (!list || list->kind != OK_LIST) {
+        error("eval_map: list object must be List. kind=%s",
+              ObjectKind_to_str(list->kind));
+    }
+    if (list_node->next) {
+        error("eval_map: list next value must be null.");
+    }
+
+    // apply lambda function to list
+    ObjectNode head;
+    head.next = NULL;
+    ObjectNode* tail = &head;
+    ObjectNode* cur = list->value.as_list;
+    String* arg = lambda->params->value;
+    while (cur) {
+        Env* func_scope = env_extend(env);
+        env_set(func_scope, arg, cur->content);
+
+        Object* o = eval_list(lambda->body->content->value.as_list, func_scope);
+        tail = new_node(tail, o);
+        cur = cur->next;
+    }
+
+    Object* ret = new_object(OK_LIST);
+    ret->value.as_list = head.next;
+    return ret;
+}
+
 Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
@@ -334,6 +384,9 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             }
             if (string_chars_eq(head->value.as_symbol, "list")) {
                 return eval_list_data(objs, env);
+            }
+            if (string_chars_eq(head->value.as_symbol, "map")) {
+                return eval_map(objs, env);
             }
             return eval_function_call(objs, env);
         }

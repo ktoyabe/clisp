@@ -39,6 +39,15 @@ StringNode* newStringNode(StringNode* cur, String* value) {
     return node;
 }
 
+size_t StringNode_len(StringNode* cur) {
+    size_t len = 0;
+    while (cur) {
+        len++;
+        cur = cur->next;
+    }
+    return len;
+}
+
 ObjectLambda* newObjectLambda(StringNode* params, ObjectNode* body) {
     ObjectLambda* o = (ObjectLambda*)calloc(1, sizeof(ObjectLambda));
     o->params = params;
