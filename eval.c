@@ -515,6 +515,21 @@ Object* eval_reduce(ObjectNode* objs, Env* env) {
     return acc;
 }
 
+Object* eval_length(ObjectNode* objs, Env* env) {
+    ObjectNode* list_node = objs->next;
+    object_result result = pickup_list_object(list_node, env);
+    if (result.error_msg) {
+        error("eval_map: %s", result.error_msg);
+    }
+    if (list_node->next) {
+        error("eval_map: list next value must be null.");
+    }
+    Object* list = result.object;
+    size_t len = ObjectNode_len(list->value.as_list);
+
+    return new_int_object(len);
+}
+
 Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
@@ -545,6 +560,9 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             }
             if (string_chars_eq(head->value.as_symbol, "reduce")) {
                 return eval_reduce(objs, env);
+            }
+            if (string_chars_eq(head->value.as_symbol, "length")) {
+                return eval_length(objs, env);
             }
             return eval_function_call(objs, env);
         }

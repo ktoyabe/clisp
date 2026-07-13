@@ -627,3 +627,21 @@ def test_reduce_bool_list():
         'clisp> ',
     ]
     assert result == expected
+
+def test_length():
+    result = run_script([
+        '(define l (list 1 2 3))',
+        '(length l)',
+        '(length (list 1 2))',
+        '(length (list 2))',
+        '(length (list))',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> 3',
+        'clisp> 2',
+        'clisp> 1',
+        'clisp> 0',
+        'clisp> ',
+    ]
+    assert result == expected

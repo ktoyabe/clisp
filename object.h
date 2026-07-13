@@ -66,6 +66,7 @@ struct ObjectNode {
 };
 
 ObjectNode* new_node(ObjectNode* cur, Object* object);
+size_t ObjectNode_len(ObjectNode* cur);
 
 void print_objs(FILE* stream, ObjectNode* objs);
 void print_obj(FILE* stream, Object* obj, int indent);

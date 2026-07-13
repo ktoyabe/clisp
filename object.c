@@ -117,6 +117,15 @@ ObjectNode* new_node(ObjectNode* cur, Object* object) {
     return node;
 }
 
+size_t ObjectNode_len(ObjectNode* cur) {
+    size_t len = 0;
+    while (cur) {
+        len++;
+        cur = cur->next;
+    }
+    return len;
+}
+
 void print_obj_raw(FILE* stream, Object* obj) {
     switch (obj->kind) {
         case OK_RESERVED:
