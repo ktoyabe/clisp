@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#include "common.h"
+
 static const char* OK_VOID_STR = "OK_VOID";
 static const char* OK_INTEGER_STR = "OK_INTEGER";
 static const char* OK_RESERVED_STR = "OK_RESERVED";
@@ -66,6 +68,35 @@ Object* new_float_object(double val) {
 Object* new_bool_object(bool val) {
     Object* o = new_object(OK_BOOL);
     o->value.as_bool = val;
+    return o;
+}
+
+Object* object_list_concat(Object* lhs, Object* rhs) {
+    if (lhs->kind != OK_LIST) {
+        error("object_list_const: lhs kind be OK_LIST. kind=%s",
+              ObjectKind_to_str(lhs->kind));
+    }
+    if (rhs->kind != OK_LIST) {
+        error("object_list_const: rhs kind be OK_LIST. kind=%s",
+              ObjectKind_to_str(rhs->kind));
+    }
+    ObjectNode head;
+    head.next = NULL;
+    ObjectNode* tail = &head;
+    ObjectNode* cur = lhs->value.as_list;
+    while (cur) {
+        tail = new_node(tail, cur->content);
+        cur = cur->next;
+    }
+
+    cur = rhs->value.as_list;
+    while (cur) {
+        tail = new_node(tail, cur->content);
+        cur = cur->next;
+    }
+
+    Object* o = new_object(OK_LIST);
+    o->value.as_list = head.next;
     return o;
 }
 

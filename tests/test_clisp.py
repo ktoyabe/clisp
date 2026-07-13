@@ -467,3 +467,24 @@ def test_empty_list():
         'clisp> ',
     ]
     assert result == expected
+
+
+def test_list_concat():
+    result = run_script([
+        '(+ (list 1 2) (list 3 4))',
+        '(+ (list 1) (list 3 4))',
+        '(+ (list 1 2) (list 4))',
+        '(+ (list ) (list 4))',
+        '(+ (list 1 ) (list ))',
+        '(+ (list ) (list ))',
+        ])
+    expected = [
+        'clisp> (1 2 3 4)',
+        'clisp> (1 3 4)',
+        'clisp> (1 2 4)',
+        'clisp> (4)',
+        'clisp> (1)',
+        'clisp> ()',
+        'clisp> ',
+    ]
+    assert result == expected

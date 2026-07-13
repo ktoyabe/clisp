@@ -162,6 +162,17 @@ Object* eval_binary_op(ObjectNode* objs, Env* env) {
             }
         }
     }
+    if (lhs_kind == OK_LIST && rhs_kind == OK_LIST) {
+        switch (operator->value.as_char) {
+            case '+': {
+                return object_list_concat(lhs_val, rhs_val);
+            }
+            default: {
+                error("eval_binary_op: unsupported operator '%c' in ObjstList",
+                      operator->value.as_char);
+            }
+        }
+    }
     error("unsupported binary_operator. op=%c, lhs_type=%s, rhs_type=%s",
           operator->value.as_char, ObjectKind_to_str(lhs_kind),
           ObjectKind_to_str(rhs_kind));

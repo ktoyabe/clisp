@@ -57,6 +57,7 @@ Object* new_object(ObjectKind kind);
 Object* new_int_object(int val);
 Object* new_float_object(double val);
 Object* new_bool_object(bool val);
+Object* object_list_concat(Object* lhs, Object* rhs);
 
 struct ObjectNode {
     Object* content;
