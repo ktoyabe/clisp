@@ -458,6 +458,63 @@ Object* eval_filter(ObjectNode* objs, Env* env) {
     return ret;
 }
 
+Object* eval_reduce(ObjectNode* objs, Env* env) {
+    ObjectNode* func_node = objs->next;
+    object_result result = pickup_lambda_object(func_node, env);
+    if (result.error_msg) {
+        error("eval_reduce: %s", result.error_msg);
+    }
+    ObjectLambda* lambda = result.object->value.as_lambda;
+    size_t args_len = StringNode_len(lambda->params);
+    if (args_len != 2) {
+        error("eval_reduce: function args length must be 2. len=%d", args_len);
+    }
+
+    ObjectNode* list_node = func_node->next;
+    result = pickup_list_object(list_node, env);
+    if (result.error_msg) {
+        error("eval_reduce: %s", result.error_msg);
+    }
+    if (list_node->next) {
+        error("eval_reduce: list next value must be null.");
+    }
+    Object* list = result.object;
+
+    // apply lambda function to list
+    ObjectNode head;
+    head.next = NULL;
+    ObjectNode* tail = &head;
+    ObjectNode* cur = list->value.as_list;
+    String* arg0 = lambda->params->value;
+    String* arg1 = lambda->params->next->value;
+
+    Object* acc = cur->content;  // list head
+    if (!acc) {
+        error("eval_reduce: list is empty.");
+    }
+    cur = cur->next;
+    if (!cur) {
+        error("eval_reduce: list length >= 2. length=1");
+    }
+    while (cur) {
+        Env* func_scope = env_extend(env);
+        env_set(func_scope, arg0, acc);
+        env_set(func_scope, arg1, cur->content);
+
+        Object* o = eval_list(lambda->body->content->value.as_list, func_scope);
+        if (o->kind != acc->kind) {
+            error(
+                "eval_reduce: acc.kind != reduce_result.king . acc.kind=%s, "
+                "reduce_result.king=%s",
+                ObjectKind_to_str(acc->kind), ObjectKind_to_str(o->kind));
+        }
+        acc = o;
+        cur = cur->next;
+    }
+
+    return acc;
+}
+
 Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
@@ -485,6 +542,9 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             }
             if (string_chars_eq(head->value.as_symbol, "filter")) {
                 return eval_filter(objs, env);
+            }
+            if (string_chars_eq(head->value.as_symbol, "reduce")) {
+                return eval_reduce(objs, env);
             }
             return eval_function_call(objs, env);
         }

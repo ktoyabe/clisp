@@ -577,3 +577,53 @@ def test_filter_when_list_is_empty():
         'clisp> ',
     ]
     assert result == expected
+
+def test_reduce_num_list():
+    result = run_script([
+        '(define l (list 1 2 4 3))',
+        '(define acc_plus (lambda (x y) (+ x y)))',
+        '(reduce acc_plus l)',
+        '(reduce (lambda (x y) (+ x y)) l)',
+        '(reduce acc_plus (list 1 2 3))',
+        '(reduce (lambda (x y) (+ x y)) (list 1 2))',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> 10',
+        'clisp> 10',
+        'clisp> 6',
+        'clisp> 3',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_reduce_bool_list():
+    result = run_script([
+        '(define ftf (list #f #t #f))',
+        '(define ttt (list #t #t #t))',
+        '(define fff (list #f #f #f))',
+        '(define acc_and (lambda (x y) (& x y)))',
+        '(reduce acc_and ftf)',
+        '(reduce acc_and ttt)',
+        '(reduce acc_and fff)',
+        '(define acc_or (lambda (x y) (| x y)))',
+        '(reduce acc_or ftf)',
+        '(reduce acc_or ttt)',
+        '(reduce acc_or fff)',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> [VOID]',
+        'clisp> #t',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> ',
+    ]
+    assert result == expected
