@@ -526,3 +526,54 @@ def test_map_apply_empty_list():
         'clisp> ',
     ]
     assert result == expected
+
+
+def test_filter():
+    result = run_script([
+        '(define l (list 1 2 4 3))',
+        '(define isodd (lambda (x) (= (% x 2) 1)))',
+        '(filter isodd l)',
+        '(filter isodd (list 1 3 4 5))',
+        '(filter isodd (list 2 4))',
+        '(filter (lambda (x) (= (% x 2) 0)) l)',
+        '(filter (lambda (x) (= (% x 2) 0)) (list 1 2 3))',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> (1 3)',
+        'clisp> (1 3 5)',
+        'clisp> ()',
+        'clisp> (2 4)',
+        'clisp> (2)',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_filter_when_result_is_emtpy():
+    result = run_script([
+        '(define isodd (lambda (x) (= (% x 2) 1)))',
+        '(filter isodd (list 2 4))',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> ()',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_filter_when_list_is_empty():
+    result = run_script([
+        '(define l (list))',
+        '(define isodd (lambda (x) (= (% x 2) 1)))',
+        '(filter isodd l)',
+        '(filter isodd (list))',
+        ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> ()',
+        'clisp> ()',
+        'clisp> ',
+    ]
+    assert result == expected

@@ -410,6 +410,54 @@ Object* eval_map(ObjectNode* objs, Env* env) {
     return ret;
 }
 
+Object* eval_filter(ObjectNode* objs, Env* env) {
+    ObjectNode* func_node = objs->next;
+    object_result result = pickup_lambda_object(func_node, env);
+    if (result.error_msg) {
+        error("eval_filter: %s", result.error_msg);
+    }
+    ObjectLambda* lambda = result.object->value.as_lambda;
+    size_t args_len = StringNode_len(lambda->params);
+    if (args_len != 1) {
+        error("eval_filter: function args length must be 1. len=%d", args_len);
+    }
+
+    ObjectNode* list_node = func_node->next;
+    result = pickup_list_object(list_node, env);
+    if (result.error_msg) {
+        error("eval_filter: %s", result.error_msg);
+    }
+    if (list_node->next) {
+        error("eval_filter: list next value must be null.");
+    }
+    Object* list = result.object;
+
+    // apply lambda function to list
+    ObjectNode head;
+    head.next = NULL;
+    ObjectNode* tail = &head;
+    ObjectNode* cur = list->value.as_list;
+    String* arg = lambda->params->value;
+    while (cur) {
+        Env* func_scope = env_extend(env);
+        env_set(func_scope, arg, cur->content);
+
+        Object* o = eval_list(lambda->body->content->value.as_list, func_scope);
+        if (o->kind != OK_BOOL) {
+            error("eval_filter: labmda msut return bool type. kind=%s",
+                  ObjectKind_to_str(o->kind));
+        }
+        if (o->value.as_bool) {
+            tail = new_node(tail, cur->content);
+        }
+        cur = cur->next;
+    }
+
+    Object* ret = new_object(OK_LIST);
+    ret->value.as_list = head.next;
+    return ret;
+}
+
 Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
@@ -434,6 +482,9 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             }
             if (string_chars_eq(head->value.as_symbol, "map")) {
                 return eval_map(objs, env);
+            }
+            if (string_chars_eq(head->value.as_symbol, "filter")) {
+                return eval_filter(objs, env);
             }
             return eval_function_call(objs, env);
         }
