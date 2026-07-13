@@ -1,5 +1,9 @@
 #include "eval.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "common.h"
 
 Object* eval_symbol(Object* obj, Env* env);
@@ -313,35 +317,78 @@ Object* eval_list_data(ObjectNode* objs, Env* env) {
     return o;
 }
 
-Object* eval_map(ObjectNode* objs, Env* env) {
-    ObjectNode* op = objs;
-    ObjectNode* func_node = op->next;
+#define ERROR_MSG_LEN 255
+
+typedef struct {
+    char* error_msg;
+    Object* object;
+} object_result;
+
+object_result ObjectErr(const char* msg) {
+    object_result result;
+    result.object = NULL;
+    result.error_msg = (char*)malloc(sizeof(strlen(msg) + 1));
+    strcpy(result.error_msg, msg);
+    return result;
+}
+
+object_result ObjectOk(Object* o) {
+    object_result result;
+    result.error_msg = NULL;
+    result.object = o;
+
+    return result;
+}
+
+object_result pickup_lambda_object(ObjectNode* func_node, Env* env) {
     if (!func_node) {
-        error("eval_map: function node is null.");
+        return ObjectErr("function node is null.");
     }
     Object* func_obj = eval_obj(func_node->content, env);
     if (!func_obj || func_obj->kind != OK_LAMBDA) {
-        error("eval_map: function object kind must be Lambda. kind=%s",
-              ObjectKind_to_str(func_node->content->kind));
+        char msg[ERROR_MSG_LEN];
+        sprintf(msg, "function object kind must be Lambda. kind=%s",
+                ObjectKind_to_str(func_node->content->kind));
+        return ObjectErr(msg);
     }
-    ObjectLambda* lambda = func_obj->value.as_lambda;
+    return ObjectOk(func_obj);
+}
+
+object_result pickup_list_object(ObjectNode* list_node, Env* env) {
+    if (!list_node) {
+        return ObjectErr("list node is null.");
+    }
+    Object* list = eval_obj(list_node->content, env);
+    if (!list || list->kind != OK_LIST) {
+        char msg[ERROR_MSG_LEN];
+        sprintf(msg, "eval_map: list object must be List. kind=%s",
+                ObjectKind_to_str(list->kind));
+        return ObjectErr(msg);
+    }
+    return ObjectOk(list);
+}
+
+Object* eval_map(ObjectNode* objs, Env* env) {
+    ObjectNode* func_node = objs->next;
+    object_result result = pickup_lambda_object(func_node, env);
+    if (result.error_msg) {
+        error("eval_map: %s", result.error_msg);
+    }
+    ObjectLambda* lambda = result.object->value.as_lambda;
     size_t args_len = StringNode_len(lambda->params);
     if (args_len != 1) {
         error("eval_map: function args length must be 1. len=%d", args_len);
     }
 
     ObjectNode* list_node = func_node->next;
-    if (!list_node) {
-        error("eval_map: list node is null.");
-    }
-    Object* list = eval_obj(list_node->content, env);
-    if (!list || list->kind != OK_LIST) {
-        error("eval_map: list object must be List. kind=%s",
-              ObjectKind_to_str(list->kind));
+    result = pickup_list_object(list_node, env);
+    if (result.error_msg) {
+        error("eval_map: %s", result.error_msg);
     }
     if (list_node->next) {
         error("eval_map: list next value must be null.");
     }
+    Object* list = result.object;
 
     // apply lambda function to list
     ObjectNode head;
