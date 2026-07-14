@@ -244,7 +244,7 @@ Object* eval_function_definition(ObjectNode* objs, Env* env) {
         error("eval_function_define: body_node must not be null.");
     }
 
-    ObjectLambda* lambda = newObjectLambda(params, body_node);
+    ObjectLambda* lambda = newObjectLambda(params, body_node, env);
     Object* o = new_object(OK_LAMBDA);
     o->value.as_lambda = lambda;
 
@@ -271,7 +271,7 @@ Object* eval_function_call(ObjectNode* objs, Env* env) {
     if (lambda->kind != OK_LAMBDA) {
         error("Not a lambda object.");
     }
-    Env* function_scope = env_extend(env);
+    Env* function_scope = env_extend(lambda->value.as_lambda->env);
     ObjectNode* param = objs->next;
     StringNode* name = lambda->value.as_lambda->params;
     while (param) {

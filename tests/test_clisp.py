@@ -676,3 +676,18 @@ def test_range_with_vars():
         'clisp> ',
     ]
     assert result == expected
+
+def test_closure():
+    result = run_script([
+        "(define addn (lambda (n) (lambda (a) (+ n a))))",
+        "(define add5 (addn 5))",
+        "(add5 10)",
+    ])
+    expected = [
+        'clisp> [VOID]',
+        'clisp> [VOID]',
+        'clisp> 15',
+        'clisp> ',
+    ]
+    assert result == expected
+

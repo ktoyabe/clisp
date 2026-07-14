@@ -8,6 +8,7 @@
 typedef struct Object Object;
 typedef struct ObjectNode ObjectNode;
 typedef struct StringNode StringNode;
+struct Env;
 
 typedef enum {
     OK_VOID,
@@ -36,9 +37,11 @@ size_t StringNode_len(StringNode* cur);
 typedef struct {
     StringNode* params;
     ObjectNode* body;
+    struct Env* env;
 } ObjectLambda;
 
-ObjectLambda* newObjectLambda(StringNode* cur, ObjectNode* body);
+ObjectLambda* newObjectLambda(StringNode* cur, ObjectNode* body,
+                              struct Env* env);
 
 typedef union {
     char as_char;

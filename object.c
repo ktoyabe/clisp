@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "env.h"
 
 static const char* OK_VOID_STR = "OK_VOID";
 static const char* OK_INTEGER_STR = "OK_INTEGER";
@@ -50,10 +51,12 @@ size_t StringNode_len(StringNode* cur) {
     return len;
 }
 
-ObjectLambda* newObjectLambda(StringNode* params, ObjectNode* body) {
+ObjectLambda* newObjectLambda(StringNode* params, ObjectNode* body,
+                              struct Env* env) {
     ObjectLambda* o = (ObjectLambda*)calloc(1, sizeof(ObjectLambda));
     o->params = params;
     o->body = body;
+    o->env = env;
 
     return o;
 }
