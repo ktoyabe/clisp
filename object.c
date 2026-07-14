@@ -6,11 +6,13 @@
 
 static const char* OK_VOID_STR = "OK_VOID";
 static const char* OK_INTEGER_STR = "OK_INTEGER";
-static const char* OK_RESERVED_STR = "OK_RESERVED";
+static const char* OK_BINARYOP_STR = "OK_BINARYOP";
 static const char* OK_BOOL_STR = "OK_BOOL";
 static const char* OK_SYMBOL_STR = "OK_SYMBOL";
 static const char* OK_LAMBDA_STR = "OK_LAMBDA";
 static const char* OK_LIST_STR = "OK_LIST";
+static const char* OK_IF_STR = "OK_IF";
+static const char* OK_KEYWORD_STR = "OK_KEYWORD";
 
 const char* ObjectKind_to_str(ObjectKind kind) {
     switch (kind) {
@@ -18,8 +20,8 @@ const char* ObjectKind_to_str(ObjectKind kind) {
             return OK_VOID_STR;
         case OK_INTEGER:
             return OK_INTEGER_STR;
-        case OK_RESERVED:
-            return OK_RESERVED_STR;
+        case OK_BINARYOP:
+            return OK_BINARYOP_STR;
         case OK_BOOL:
             return OK_BOOL_STR;
         case OK_SYMBOL:
@@ -128,7 +130,7 @@ size_t ObjectNode_len(ObjectNode* cur) {
 
 void print_obj_raw(FILE* stream, Object* obj) {
     switch (obj->kind) {
-        case OK_RESERVED:
+        case OK_BINARYOP:
             fprintf(stream, "%c", obj->value.as_char);
             return;
         case OK_VOID:
@@ -144,7 +146,7 @@ void print_obj_raw(FILE* stream, Object* obj) {
             fprintf(stream, "%.4lf", obj->value.as_float);
             return;
         case OK_SYMBOL:
-            fprintf(stream, "%s", obj->value.as_symbol->str);
+            fprintf(stream, "%s", obj->value.as_string->str);
             return;
         case OK_STRING:
             fprintf(stream, "\"%s\"", obj->value.as_string->str);

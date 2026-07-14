@@ -11,7 +11,7 @@ typedef struct StringNode StringNode;
 
 typedef enum {
     OK_VOID,
-    OK_RESERVED,
+    OK_BINARYOP,
     OK_INTEGER,
     OK_FLOAT,
     OK_BOOL,
@@ -19,6 +19,8 @@ typedef enum {
     OK_STRING,
     OK_LAMBDA,
     OK_LIST,
+    OK_IF,
+    OK_KEYWORD,
 } ObjectKind;
 
 const char* ObjectKind_to_str(ObjectKind kind);
@@ -43,7 +45,6 @@ typedef union {
     int as_int;
     double as_float;
     bool as_bool;
-    String* as_symbol;
     String* as_string;
     ObjectLambda* as_lambda;
     ObjectNode* as_list;

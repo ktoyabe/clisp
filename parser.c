@@ -26,8 +26,8 @@ ObjectNode* parse_impl(Parser* parser) {
 
     while (TK_EOF != parser->token->kind) {
         switch (parser->token->kind) {
-            case TK_RESERVED: {
-                Object* o = new_object(OK_RESERVED);
+            case TK_BINARYOP: {
+                Object* o = new_object(OK_BINARYOP);
                 o->value.as_char = parser->token->value.as_char;
                 cur = new_node(cur, o);
                 consume(parser);
@@ -46,9 +46,22 @@ ObjectNode* parse_impl(Parser* parser) {
                 consume(parser);
                 continue;
             }
+            case TK_IF: {
+                Object* o = new_object(OK_IF);
+                cur = new_node(cur, o);
+                consume(parser);
+                continue;
+            }
+            case TK_KEYWORD: {
+                Object* o = new_object(OK_KEYWORD);
+                o->value.as_string = parser->token->value.as_string;
+                cur = new_node(cur, o);
+                consume(parser);
+                continue;
+            }
             case TK_SYMBOL: {
                 Object* o = new_object(OK_SYMBOL);
-                o->value.as_symbol = parser->token->value.as_symbol;
+                o->value.as_string = parser->token->value.as_string;
                 cur = new_node(cur, o);
                 consume(parser);
                 continue;

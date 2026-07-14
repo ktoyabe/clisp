@@ -6,7 +6,9 @@
 typedef enum {
     TK_LPAREN,    // (
     TK_RPAREN,    // )
-    TK_RESERVED,  // 記号
+    TK_BINARYOP,  // 記号
+    TK_IF,        // if
+    TK_KEYWORD,   // 予約語(if除く)
     TK_NUM,       // int
     TK_FLOAT,     // float
     TK_BOOL,      // boolean
@@ -22,7 +24,6 @@ union token_value {
     int as_int;
     double as_float;
     bool as_bool;
-    String* as_symbol;
     String* as_string;
 };
 

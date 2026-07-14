@@ -206,7 +206,7 @@ Object* eval_define(ObjectNode* objs, Env* env) {
     if (symbol_node->content->kind != OK_SYMBOL) {
         error("symbol node must be OK_SYBOL");
     }
-    String* key = symbol_node->content->value.as_symbol;
+    String* key = symbol_node->content->value.as_string;
     Object* value = eval_obj(value_node->content, env);
     env_set(env, key, value);
 
@@ -221,7 +221,7 @@ StringNode* eval_params_define(ObjectNode* params, Env* env) {
         if (param->content->kind != OK_SYMBOL) {
             error("params object kind must be symbol.");
         }
-        cur = newStringNode(cur, param->content->value.as_symbol);
+        cur = newStringNode(cur, param->content->value.as_string);
         param = param->next;
     }
 
@@ -263,7 +263,7 @@ Object* eval_print(ObjectNode* objs, Env* env) {
 }
 
 Object* eval_function_call(ObjectNode* objs, Env* env) {
-    String* function_name = objs->content->value.as_symbol;
+    String* function_name = objs->content->value.as_string;
     Object* lambda = env_get(env, function_name);
     if (!lambda) {
         error("undefined function. name=%s", function_name->str);
@@ -292,9 +292,9 @@ Object* eval_function_call(ObjectNode* objs, Env* env) {
 }
 
 Object* eval_symbol(Object* obj, Env* env) {
-    Object* value = env_get(env, obj->value.as_symbol);
+    Object* value = env_get(env, obj->value.as_string);
     if (!value) {
-        error("Undefined symbol. symbol=%s", obj->value.as_symbol);
+        error("Undefined symbol. symbol=%s", obj->value.as_string);
     }
     return value;
 }
@@ -580,40 +580,42 @@ Object* eval_range(ObjectNode* objs, Env* env) {
 Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
-        case OK_RESERVED: {
+        case OK_BINARYOP: {
             return eval_binary_op(objs, env);
         }
-        case OK_SYMBOL: {
-            if (string_chars_eq(head->value.as_symbol, "if")) {
-                return eval_if(objs, env);
-            }
-            if (string_chars_eq(head->value.as_symbol, "define")) {
+        case OK_IF: {
+            return eval_if(objs, env);
+        }
+        case OK_KEYWORD: {
+            if (string_chars_eq(head->value.as_string, "define")) {
                 return eval_define(objs, env);
             }
-            if (string_chars_eq(head->value.as_symbol, "lambda")) {
+            if (string_chars_eq(head->value.as_string, "lambda")) {
                 return eval_function_definition(objs, env);
             }
-            if (string_chars_eq(head->value.as_symbol, "print")) {
+            if (string_chars_eq(head->value.as_string, "print")) {
                 return eval_print(objs, env);
             }
-            if (string_chars_eq(head->value.as_symbol, "list")) {
+            if (string_chars_eq(head->value.as_string, "list")) {
                 return eval_list_data(objs, env);
             }
-            if (string_chars_eq(head->value.as_symbol, "map")) {
+            if (string_chars_eq(head->value.as_string, "map")) {
                 return eval_map(objs, env);
             }
-            if (string_chars_eq(head->value.as_symbol, "filter")) {
+            if (string_chars_eq(head->value.as_string, "filter")) {
                 return eval_filter(objs, env);
             }
-            if (string_chars_eq(head->value.as_symbol, "reduce")) {
+            if (string_chars_eq(head->value.as_string, "reduce")) {
                 return eval_reduce(objs, env);
             }
-            if (string_chars_eq(head->value.as_symbol, "length")) {
+            if (string_chars_eq(head->value.as_string, "length")) {
                 return eval_length(objs, env);
             }
-            if (string_chars_eq(head->value.as_symbol, "range")) {
+            if (string_chars_eq(head->value.as_string, "range")) {
                 return eval_range(objs, env);
             }
+        }
+        case OK_SYMBOL: {
             return eval_function_call(objs, env);
         }
         default: {

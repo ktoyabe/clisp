@@ -2,8 +2,27 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
+
+static const char* KW_DEFINE = "define";
+static const char* KW_LIST = "list";
+static const char* KW_PRINT = "print";
+static const char* KW_LAMBDA = "lambda";
+static const char* KW_MAP = "map";
+static const char* KW_FILTER = "filter";
+static const char* KW_REDUCE = "reduce";
+static const char* KW_LENGTH = "length";
+static const char* KW_RANGE = "range";
+
+bool is_keyword(char* p) {
+    return strcmp(p, KW_DEFINE) == 0 || strcmp(p, KW_LIST) == 0 ||
+           strcmp(p, KW_PRINT) == 0 || strcmp(p, KW_LAMBDA) == 0 ||
+           strcmp(p, KW_MAP) == 0 || strcmp(p, KW_FILTER) == 0 ||
+           strcmp(p, KW_REDUCE) == 0 || strcmp(p, KW_LENGTH) == 0 ||
+           strcmp(p, KW_RANGE) == 0;
+}
 
 void print_token(FILE* stream, Token* token) {
     switch (token->kind) {
@@ -13,14 +32,20 @@ void print_token(FILE* stream, Token* token) {
         case TK_RPAREN:
             fprintf(stream, "%c[RPAREN]", token->value.as_char);
             return;
-        case TK_RESERVED:
-            fprintf(stream, "%c[RESERVED]", token->value.as_char);
+        case TK_BINARYOP:
+            fprintf(stream, "%c[BINARYOP]", token->value.as_char);
+            return;
+        case TK_IF:
+            fprintf(stream, "[IF]");
+            return;
+        case TK_KEYWORD:
+            fprintf(stream, "%s[KEYWORD]", token->value.as_string->str);
             return;
         case TK_NUM:
             fprintf(stream, "%d[NUM]", token->value.as_int);
             return;
         case TK_SYMBOL:
-            fprintf(stream, "%s[SYMBOL]", token->value.as_symbol->str);
+            fprintf(stream, "%s[SYMBOL]", token->value.as_string->str);
             return;
         case TK_STRING:
             fprintf(stream, "%s[STRING]", token->value.as_string->str);
@@ -48,7 +73,7 @@ Token* new_token(TokenKind kind, Token* cur, char* str) {
     return tok;
 }
 
-bool is_reserved(char c) {
+bool is_binaryop(char c) {
     return c == '+' || c == '-' || c == '*' || c == '/' || c == '>' ||
            c == '<' || c == '%' || c == '=' || c == '|' || c == '&';
 }
@@ -103,9 +128,9 @@ Token* tokenize(char* p) {
             }
             continue;
         }
-        if (is_reserved(*p)) {
+        if (is_binaryop(*p)) {
             // parse as reserved charactor
-            cur = new_token(TK_RESERVED, cur, p);
+            cur = new_token(TK_BINARYOP, cur, p);
             cur->value.as_char = *p;
             p++;
             continue;
@@ -150,14 +175,23 @@ Token* tokenize(char* p) {
         // parse symbol
         {
             char* start = p;
-            while (*p && !isspace(*p) && !is_reserved(*p) && !is_parents(*p)) {
+            while (*p && !isspace(*p) && !is_binaryop(*p) && !is_parents(*p)) {
                 p++;
             }
             size_t len = p - start;
             String* str = new_string_with_len(start, len);
-            cur = new_token(TK_SYMBOL, cur, p);
-            cur->value.as_symbol = str;
-            continue;
+            if (string_chars_eq(str, "if")) {
+                cur = new_token(TK_IF, cur, start);
+                continue;
+            } else if (is_keyword(str->str)) {
+                cur = new_token(TK_KEYWORD, cur, start);
+                cur->value.as_string = str;
+                continue;
+            } else {
+                cur = new_token(TK_SYMBOL, cur, start);
+                cur->value.as_string = str;
+                continue;
+            }
         }
 
         error("failed to tokenize. input=%s", p);
