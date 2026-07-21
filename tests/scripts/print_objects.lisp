@@ -1,0 +1,10 @@
+(
+    (print #t)
+    (print "foo bar")
+    (print 1)
+    (print 2.0)
+    (print (list 2 3 4))
+    (print (define a 3))
+    (define f (lambda (x) (+ x 1)))
+    (print f)
+)
