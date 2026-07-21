@@ -11,7 +11,7 @@ typedef struct StringNode StringNode;
 struct Env;
 
 typedef enum {
-    OK_VOID,
+    OK_VOID = 0,
     OK_BINARYOP,
     OK_INTEGER,
     OK_FLOAT,

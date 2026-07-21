@@ -6,7 +6,9 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/clisp",
-            "args": [],
+            "args": [
+                "${workspaceFolder}/example/sample.lisp"
+            ],
             "cwd": "${fileDirname}",
         }
     ]

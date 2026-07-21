@@ -31,6 +31,8 @@ const char* ObjectKind_to_str(ObjectKind kind) {
             return OK_LAMBDA_STR;
         case OK_LIST:
             return OK_LIST_STR;
+        case OK_KEYWORD:
+            return OK_KEYWORD_STR;
     }
 }
 
@@ -157,9 +159,14 @@ void print_obj_raw(FILE* stream, Object* obj) {
         case OK_LAMBDA:
             fprintf(stream, "%s", "[LAMBDA]");
             return;
+        case OK_IF:
+            fprintf(stream, "%s", obj->value.as_string->str);
+            return;
+        case OK_KEYWORD:
+            fprintf(stream, "%s", obj->value.as_string->str);
+            return;
         default:
-            fprintf(stream, "UnknownKind. kind=%s",
-                    ObjectKind_to_str(obj->kind));
+            fprintf(stream, "UnknownKind. kind=%d", obj->kind);
             return;
     }
 }
