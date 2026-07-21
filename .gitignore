@@ -1,3 +1,4 @@
 clisp
 *.o
 __pycache__
+objs
