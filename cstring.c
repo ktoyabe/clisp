@@ -18,6 +18,7 @@ String* new_string_with_len(char* src, size_t len) {
     val->str = (char*)malloc(len + 1);
     val->len = len;
     strncpy(val->str, src, len);
+    val->str[len] = '\0';
 
     return val;
 }

@@ -166,7 +166,7 @@ Token* tokenize(char* p) {
             }
             size_t len = p - start;
             String* str = new_string_with_len(start, len);
-            cur = new_token(TK_STRING, cur, p);
+            cur = new_token(TK_STRING, cur, str->str);
             cur->value.as_string = str;
             p++;  // skip '"'
             continue;
@@ -181,14 +181,14 @@ Token* tokenize(char* p) {
             size_t len = p - start;
             String* str = new_string_with_len(start, len);
             if (string_chars_eq(str, "if")) {
-                cur = new_token(TK_IF, cur, start);
+                cur = new_token(TK_IF, cur, str->str);
                 continue;
             } else if (is_keyword(str->str)) {
-                cur = new_token(TK_KEYWORD, cur, start);
+                cur = new_token(TK_KEYWORD, cur, str->str);
                 cur->value.as_string = str;
                 continue;
             } else {
-                cur = new_token(TK_SYMBOL, cur, start);
+                cur = new_token(TK_SYMBOL, cur, str->str);
                 cur->value.as_string = str;
                 continue;
             }
