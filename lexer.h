@@ -36,10 +36,6 @@ struct Token {
     union token_value value;
 };
 
-typedef struct {
-    Token* token;  // 現在着目しているトークン
-} Tokenizer;
-
 void print_token(FILE* stream, Token* token);
 void print_tokens(FILE* stream, Token* tokens);
 
