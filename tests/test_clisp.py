@@ -835,3 +835,16 @@ def test_closure():
     ]
     assert result == expected
 
+def test_cons():
+    result = run_script([
+        "(cons 1 (cons 2 (cons 3 (cons 4 5))))",
+        "(cons (cons 1 (cons 2 3)) 4)"
+    ])
+
+    expected = [
+        'clisp> (1 (2 (3 (4 5))))',
+        'clisp> ((1 (2 3)) 4)',
+        'clisp> ',
+    ]
+    assert result == expected
+
