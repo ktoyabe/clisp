@@ -428,6 +428,91 @@ def test_float_binary_op():
     ]
     assert result == expected
 
+def test_float_greater_than_operator():
+    result = run_script([
+        '(> 2.1 2.2)',
+        '(> 2.2 2.2)',
+        '(> 2.3 2.2)',
+        ])
+    expected = [
+        'clisp> #f',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_float_greater_than_or_equal_to_operator():
+    result = run_script([
+        '(>= 2.1 2.2)',
+        '(>= 2.2 2.2)',
+        '(>= 2.3 2.2)',
+        ])
+    expected = [
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> #t',
+        'clisp> ',
+    ]
+    assert result == expected
+
+
+def test_float_less_than_operator():
+    result = run_script([
+        '(< 2.1 2.2)',
+        '(< 2.2 2.2)',
+        '(< 2.3 2.2)',
+        ])
+    expected = [
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> #f',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_float_less_than_or_equal_to_operator():
+    result = run_script([
+        '(<= 2.1 2.2)',
+        '(<= 2.2 2.2)',
+        '(<= 2.3 2.2)',
+        ])
+    expected = [
+        'clisp> #t',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_float_equal_operator():
+    result = run_script([
+        '(= 2.1 2.2)',
+        '(= 2.2 2.2)',
+        '(= 2.3 2.2)',
+        ])
+    expected = [
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_float_not_equal_operator():
+    result = run_script([
+        '(!= 2.1 2.2)',
+        '(!= 2.2 2.2)',
+        '(!= 2.3 2.2)',
+        ])
+    expected = [
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> ',
+    ]
+    assert result == expected
+
 def test_binary_op_float_vs_int():
     result = run_script([
         '(+ -1.1 2)',
