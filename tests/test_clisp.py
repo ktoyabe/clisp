@@ -379,6 +379,27 @@ def test_string_equal():
     ]
     assert result == expected
 
+def test_string_not_equal():
+    result = run_script([
+        '(!= "ab" "cde")',
+        '(!= "ab" "cd")',
+        '(!= "ab" "ab")',
+        '(!= "ab" "")',
+        '(!= "" "ab")',
+        '(!= "" "")',
+        ])
+    expected = [
+        'clisp> #t',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> #t',
+        'clisp> #t',
+        'clisp> #f',
+        'clisp> ',
+    ]
+    assert result == expected
+
+
 def test_float_binary_op():
     result = run_script([
         '(+ -1.1 2.3)',

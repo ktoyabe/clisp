@@ -119,6 +119,9 @@ Object* eval_binary_op_string(BinaryOperator op, String* lhs, String* rhs) {
         case BO_EQUAL: {
             return new_bool_object(string_eq(lhs, rhs));
         }
+        case BO_NOT_EQUAL: {
+            return new_bool_object(!string_eq(lhs, rhs));
+        }
         default: {
             error("eval_binary_op_string: unsupported operator '%c'", op);
         }
