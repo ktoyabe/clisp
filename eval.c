@@ -39,30 +39,30 @@ Object* eval_obj(Object* obj, Env* env) {
     }
 }
 
-Object* eval_binary_op_int(char op, int lhs, int rhs) {
+Object* eval_binary_op_int(BinaryOperator op, int lhs, int rhs) {
     switch (op) {
-        case '+': {
+        case BO_PLUS: {
             return new_int_object(lhs + rhs);
         }
-        case '-': {
+        case BO_MINUS: {
             return new_int_object(lhs - rhs);
         }
-        case '*': {
+        case BO_MUL: {
             return new_int_object(lhs * rhs);
         }
-        case '/': {
+        case BO_DIV: {
             return new_int_object(lhs / rhs);
         }
-        case '%': {
+        case BO_MODULO: {
             return new_int_object(lhs % rhs);
         }
-        case '>': {
+        case BO_GREATER: {
             return new_bool_object(lhs > rhs);
         }
-        case '<': {
+        case BO_LESS: {
             return new_bool_object(lhs < rhs);
         }
-        case '=': {
+        case BO_EQUAL: {
             return new_bool_object(lhs == rhs);
         }
         default: {
@@ -71,27 +71,27 @@ Object* eval_binary_op_int(char op, int lhs, int rhs) {
     }
 }
 
-Object* eval_binary_op_float(char op, double lhs, double rhs) {
+Object* eval_binary_op_float(BinaryOperator op, double lhs, double rhs) {
     switch (op) {
-        case '+': {
+        case BO_PLUS: {
             return new_float_object(lhs + rhs);
         }
-        case '-': {
+        case BO_MINUS: {
             return new_float_object(lhs - rhs);
         }
-        case '*': {
+        case BO_MUL: {
             return new_float_object(lhs * rhs);
         }
-        case '/': {
+        case BO_DIV: {
             return new_float_object(lhs / rhs);
         }
-        case '>': {
+        case BO_GREATER: {
             return new_bool_object(lhs > rhs);
         }
-        case '<': {
+        case BO_LESS: {
             return new_bool_object(lhs < rhs);
         }
-        case '=': {
+        case BO_EQUAL: {
             return new_bool_object(lhs == rhs);
         }
         default: {
@@ -100,14 +100,14 @@ Object* eval_binary_op_float(char op, double lhs, double rhs) {
     }
 }
 
-Object* eval_binary_op_string(char op, String* lhs, String* rhs) {
+Object* eval_binary_op_string(BinaryOperator op, String* lhs, String* rhs) {
     switch (op) {
-        case '+': {
+        case BO_PLUS: {
             Object* o = new_object(OK_STRING);
             o->value.as_string = string_concat(lhs, rhs);
             return o;
         }
-        case '=': {
+        case BO_EQUAL: {
             return new_bool_object(string_eq(lhs, rhs));
         }
         default: {
@@ -117,7 +117,8 @@ Object* eval_binary_op_string(char op, String* lhs, String* rhs) {
 }
 
 Object* eval_binary_op(ObjectNode* objs, Env* env) {
-    Object* operator = objs->content;
+    Object* operator_obj = objs->content;
+    BinaryOperator op = operator_obj->value.as_binary_op;
     ObjectNode* lhs = objs->next;
     Object* lhs_val = eval_obj(lhs->content, env);
     ObjectKind lhs_kind = lhs_val->kind;
@@ -127,58 +128,54 @@ Object* eval_binary_op(ObjectNode* objs, Env* env) {
     ObjectKind rhs_kind = rhs_val->kind;
 
     if (lhs_kind == OK_INTEGER && rhs_kind == OK_INTEGER) {
-        return eval_binary_op_int(operator->value.as_char,
-                                  lhs_val->value.as_int, rhs_val->value.as_int);
+        return eval_binary_op_int(op, lhs_val->value.as_int,
+                                  rhs_val->value.as_int);
     }
     if (lhs_kind == OK_STRING && rhs_kind == OK_STRING) {
-        return eval_binary_op_string(operator->value.as_char,
-                                     lhs_val->value.as_string,
+        return eval_binary_op_string(op, lhs_val->value.as_string,
                                      rhs_val->value.as_string);
     }
     if (lhs_kind == OK_FLOAT && rhs_kind == OK_FLOAT) {
-        return eval_binary_op_float(operator->value.as_char,
-                                    lhs_val->value.as_float,
+        return eval_binary_op_float(op, lhs_val->value.as_float,
                                     rhs_val->value.as_float);
     }
     if (lhs_kind == OK_FLOAT && rhs_kind == OK_INTEGER) {
-        return eval_binary_op_float(operator->value.as_char,
-                                    lhs_val->value.as_float,
+        return eval_binary_op_float(op, lhs_val->value.as_float,
                                     (double)rhs_val->value.as_int);
     }
     if (lhs_kind == OK_INTEGER && rhs_kind == OK_FLOAT) {
-        return eval_binary_op_float(operator->value.as_char,
-                                    (double)lhs_val->value.as_int,
+        return eval_binary_op_float(op, (double)lhs_val->value.as_int,
                                     rhs_val->value.as_float);
     }
     if (lhs_kind == OK_BOOL && rhs_kind == OK_BOOL) {
-        switch (operator->value.as_char) {
-            case '|': {
+        switch (op) {
+            case BO_OR: {
                 return new_bool_object(lhs_val->value.as_bool ||
                                        rhs_val->value.as_bool);
             }
-            case '&': {
+            case BO_AND: {
                 return new_bool_object(lhs_val->value.as_bool &&
                                        rhs_val->value.as_bool);
             }
             default: {
                 error("eval_binary_op: unsupported operator '%c'",
-                      operator->value.as_char);
+                      operator_obj->value.as_char);
             }
         }
     }
     if (lhs_kind == OK_LIST && rhs_kind == OK_LIST) {
-        switch (operator->value.as_char) {
-            case '+': {
+        switch (op) {
+            case BO_PLUS: {
                 return object_list_concat(lhs_val, rhs_val);
             }
             default: {
                 error("eval_binary_op: unsupported operator '%c' in ObjstList",
-                      operator->value.as_char);
+                      operator_obj->value.as_char);
             }
         }
     }
     error("unsupported binary_operator. op=%c, lhs_type=%s, rhs_type=%s",
-          operator->value.as_char, ObjectKind_to_str(lhs_kind),
+          operator_obj->value.as_char, ObjectKind_to_str(lhs_kind),
           ObjectKind_to_str(rhs_kind));
 }
 

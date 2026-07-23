@@ -6,7 +6,7 @@ CFLAGS = -g
 
 TARGET= clisp
 OBJDIR = objs
-SRCS = main.c common.c lexer.c cstring.c object.c parser.c eval.c hashmap.c env.c repl.c
+SRCS = main.c common.c lexer.c cstring.c object.c parser.c eval.c hashmap.c env.c repl.c clisp.c
 OBJS = $(addprefix $(OBJDIR)/,$(patsubst %.c,%.o,$(SRCS)))
 
 all: $(TARGET)

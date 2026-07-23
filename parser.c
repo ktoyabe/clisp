@@ -28,7 +28,7 @@ ObjectNode* parse_impl(Parser* parser) {
         switch (parser->token->kind) {
             case TK_BINARYOP: {
                 Object* o = new_object(OK_BINARYOP);
-                o->value.as_char = parser->token->value.as_char;
+                o->value.as_binary_op = parser->token->value.as_binary_op;
                 cur = new_node(cur, o);
                 consume(parser);
                 continue;

@@ -1,6 +1,7 @@
 #pragma once
 #include <stdbool.h>
 
+#include "clisp.h"
 #include "cstring.h"
 
 typedef enum {
@@ -25,6 +26,7 @@ union token_value {
     double as_float;
     bool as_bool;
     String* as_string;
+    BinaryOperator as_binary_op;
 };
 
 struct Token {

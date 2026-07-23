@@ -73,11 +73,6 @@ Token* new_token(TokenKind kind, Token* cur, char* str) {
     return tok;
 }
 
-bool is_binaryop(char c) {
-    return c == '+' || c == '-' || c == '*' || c == '/' || c == '>' ||
-           c == '<' || c == '%' || c == '=' || c == '|' || c == '&';
-}
-
 bool is_parents(char c) { return c == '(' || c == ')'; }
 
 Token* tokenize_number(char** p, Token* cur) {
@@ -128,11 +123,15 @@ Token* tokenize(char* p) {
             }
             continue;
         }
-        if (is_binaryop(*p)) {
-            // parse as reserved charactor
+        int len;
+        BinaryOperator op = str_to_binary_op(p, &len);
+        if (op != BO_UNKNOWN) {
+            // parse as binary operator
             cur = new_token(TK_BINARYOP, cur, p);
-            cur->value.as_char = *p;
-            p++;
+            cur->value.as_binary_op = op;
+            while (len--) {
+                p++;
+            }
             continue;
         }
 
@@ -175,7 +174,10 @@ Token* tokenize(char* p) {
         // parse symbol
         {
             char* start = p;
-            while (*p && !isspace(*p) && !is_binaryop(*p) && !is_parents(*p)) {
+            int binary_op_len;
+            while (*p && !isspace(*p) &&
+                   BO_UNKNOWN == str_to_binary_op(p, &binary_op_len) &&
+                   !is_parents(*p)) {
                 p++;
             }
             size_t len = p - start;

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "clisp.h"
 #include "cstring.h"
 
 typedef struct Object Object;
@@ -49,6 +50,7 @@ typedef union {
     double as_float;
     bool as_bool;
     String* as_string;
+    BinaryOperator as_binary_op;
     ObjectLambda* as_lambda;
     ObjectNode* as_list;
 } ObjectValue;
