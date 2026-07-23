@@ -595,6 +595,31 @@ Object* eval_range(ObjectNode* objs, Env* env) {
     return list;
 }
 
+Object* eval_cons(ObjectNode* objs, Env* env) {
+    ObjectNode* car_node = objs->next;
+    if (!car_node) {
+        error("eval_cons must be 3 elements.");
+    }
+    ObjectNode* cdr_node = car_node->next;
+    if (!cdr_node) {
+        error("eval_cons must be 3 elements.");
+    }
+    if (cdr_node->next) {
+        error("eval_cons must be 3 elements.");
+    }
+    ObjectNode head;
+    head.next = NULL;
+    ObjectNode* tail = &head;
+    Object* car_obj = eval_obj(car_node->content, env);
+    tail = new_node(tail, car_obj);
+
+    Object* cdr_obj = eval_obj(cdr_node->content, env);
+    tail = new_node(tail, cdr_obj);
+    Object* list = new_object(OK_LIST);
+    list->value.as_list = head.next;
+    return list;
+}
+
 Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
@@ -631,6 +656,9 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             }
             if (string_chars_eq(head->value.as_string, "range")) {
                 return eval_range(objs, env);
+            }
+            if (string_chars_eq(head->value.as_string, "cons")) {
+                return eval_cons(objs, env);
             }
         }
         case OK_SYMBOL: {

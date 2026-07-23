@@ -15,13 +15,17 @@ static const char* KW_FILTER = "filter";
 static const char* KW_REDUCE = "reduce";
 static const char* KW_LENGTH = "length";
 static const char* KW_RANGE = "range";
+static const char* KW_CONS = "cons";
+static const char* KW_CAR = "car";
+static const char* KW_CDR = "cdr";
 
 bool is_keyword(char* p) {
     return strcmp(p, KW_DEFINE) == 0 || strcmp(p, KW_LIST) == 0 ||
            strcmp(p, KW_PRINT) == 0 || strcmp(p, KW_LAMBDA) == 0 ||
            strcmp(p, KW_MAP) == 0 || strcmp(p, KW_FILTER) == 0 ||
            strcmp(p, KW_REDUCE) == 0 || strcmp(p, KW_LENGTH) == 0 ||
-           strcmp(p, KW_RANGE) == 0;
+           strcmp(p, KW_RANGE) == 0 || strcmp(p, KW_CONS) == 0 ||
+           strcmp(p, KW_CAR) == 0 || strcmp(p, KW_CDR) == 0;
 }
 
 void print_token(FILE* stream, Token* token) {

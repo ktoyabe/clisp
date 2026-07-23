@@ -133,6 +133,8 @@ size_t ObjectNode_len(ObjectNode* cur) {
     return len;
 }
 
+void print_obj_list(FILE* stream, Object* obj);
+
 void print_obj_raw(FILE* stream, Object* obj) {
     switch (obj->kind) {
         case OK_BINARYOP:
@@ -164,6 +166,9 @@ void print_obj_raw(FILE* stream, Object* obj) {
             return;
         case OK_KEYWORD:
             fprintf(stream, "%s", obj->value.as_string->str);
+            return;
+        case OK_LIST:
+            print_obj_list(stream, obj);
             return;
         default:
             fprintf(stream, "UnknownKind. kind=%d", obj->kind);
