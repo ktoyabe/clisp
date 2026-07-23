@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/clisp",
             "args": [
-                "${workspaceFolder}/example/sample.lisp"
+                "${workspaceFolder}/example/binary_op.lisp"
             ],
             "cwd": "${fileDirname}",
         }

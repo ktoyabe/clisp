@@ -17,12 +17,24 @@ BinaryOperator str_to_binary_op(char* p, int* len) {
         case '/':
             *len = 1;
             return BO_DIV;
-        case '>':
-            *len = 1;
-            return BO_GREATER;
-        case '<':
-            *len = 1;
-            return BO_LESS;
+        case '>': {
+            if (*(p + 1) == '=') {
+                *len = 2;
+                return BO_GREATER_EQ;
+            } else {
+                *len = 1;
+                return BO_GREATER;
+            }
+        }
+        case '<': {
+            if (*(p + 1) == '=') {
+                *len = 2;
+                return BO_LESS_EQ;
+            } else {
+                *len = 1;
+                return BO_LESS;
+            }
+        }
         case '%':
             *len = 1;
             return BO_MODULO;
@@ -36,15 +48,10 @@ BinaryOperator str_to_binary_op(char* p, int* len) {
             *len = 1;
             return BO_AND;
     }
-    if (strcmp(p, "!=") == 0) {
+
+    if (strncmp(p, "!=", 2) == 0) {
         *len = 2;
         return BO_NOT_EQUAL;
-    } else if (strcmp(p, ">=") == 0) {
-        *len = 2;
-        return BO_GREATER_EQ;
-    } else if (strcmp(p, "<=") == 0) {
-        *len = 2;
-        return BO_LESS_EQ;
     }
     return BO_UNKNOWN;
 }

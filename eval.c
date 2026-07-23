@@ -59,11 +59,20 @@ Object* eval_binary_op_int(BinaryOperator op, int lhs, int rhs) {
         case BO_GREATER: {
             return new_bool_object(lhs > rhs);
         }
+        case BO_GREATER_EQ: {
+            return new_bool_object(lhs >= rhs);
+        }
         case BO_LESS: {
             return new_bool_object(lhs < rhs);
         }
+        case BO_LESS_EQ: {
+            return new_bool_object(lhs <= rhs);
+        }
         case BO_EQUAL: {
             return new_bool_object(lhs == rhs);
+        }
+        case BO_NOT_EQUAL: {
+            return new_bool_object(lhs != rhs);
         }
         default: {
             error("eval_binary_op_int: unsupported operator '%c'", op);

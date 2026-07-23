@@ -75,9 +75,36 @@ def test_less_than_is_false():
     ]
     assert result == expected
 
+def test_less_than_or_equal_to():
+    result = run_script(["(<= 0 1)",
+                         "(<= 1 1)",
+                         "(<= 2 1)",
+                         ])
+    expected = [
+        "clisp> #t",
+        "clisp> #t",
+        "clisp> #f",
+        "clisp> ",
+    ]
+    assert result == expected
+
+
 def test_greater_than_is_true():
     result = run_script(["(> 1 -2)"])
     expected = [
+        "clisp> #t",
+        "clisp> ",
+    ]
+    assert result == expected
+
+def test_greater_than_or_equal_to():
+    result = run_script(["(>= 0 1)",
+                         "(>= 1 1)",
+                         "(>= 2 1)",
+                         ])
+    expected = [
+        "clisp> #f",
+        "clisp> #t",
         "clisp> #t",
         "clisp> ",
     ]
@@ -106,6 +133,17 @@ def test_eq_is_false():
         "clisp> ",
     ]
     assert result == expected
+
+def test_not_eq():
+    result = run_script(["(!= 0 1)",
+                         "(!= 1 1)"])
+    expected = [
+        "clisp> #t",
+        "clisp> #f",
+        "clisp> ",
+    ]
+    assert result == expected
+
 
 def test_if_execute_true_stmt():
     result = run_script(["(if (< 1 2) 3 4)"])
