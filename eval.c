@@ -620,6 +620,41 @@ Object* eval_cons(ObjectNode* objs, Env* env) {
     return list;
 }
 
+Object* eval_car(ObjectNode* objs, Env* env) {
+    ObjectNode* node = objs->next;
+    if (!node) {
+        error("eval_car must be 2 elements.");
+    }
+    if (node->next) {
+        error("eval_car must be 2 elements.");
+    }
+    Object* obj = eval_obj(node->content, env);
+    if (OK_LIST != obj->kind) {
+        error("eval_car: object type must be list.");
+    }
+    return obj->value.as_list->content;
+}
+
+Object* eval_cdr(ObjectNode* objs, Env* env) {
+    ObjectNode* node = objs->next;
+    if (!node) {
+        error("eval_cdr must be 2 elements.");
+    }
+    if (node->next) {
+        error("eval_cdr must be 2 elements.");
+    }
+    Object* obj = eval_obj(node->content, env);
+    if (OK_LIST != obj->kind) {
+        error("eval_cdr: object type must be list.");
+    }
+    ObjectNode* list = obj->value.as_list;
+    ObjectNode* cdr_node = list->next;
+    if (!cdr_node) {
+        error("eval_cdr: list must be 2 elements.");
+    }
+    return cdr_node->content;
+}
+
 Object* eval_list(ObjectNode* objs, Env* env) {
     Object* head = objs->content;
     switch (head->kind) {
@@ -659,6 +694,12 @@ Object* eval_list(ObjectNode* objs, Env* env) {
             }
             if (string_chars_eq(head->value.as_string, "cons")) {
                 return eval_cons(objs, env);
+            }
+            if (string_chars_eq(head->value.as_string, "car")) {
+                return eval_car(objs, env);
+            }
+            if (string_chars_eq(head->value.as_string, "cdr")) {
+                return eval_cdr(objs, env);
             }
         }
         case OK_SYMBOL: {

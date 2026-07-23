@@ -848,3 +848,33 @@ def test_cons():
     ]
     assert result == expected
 
+def test_car_cdr():
+    result = run_script([
+        "(define a (cons 1 2))",
+        "(car a)",
+        "(cdr a)",
+    ])
+
+    expected = [
+        'clisp> [VOID]',
+        'clisp> 1',
+        'clisp> 2',
+        'clisp> ',
+    ]
+    assert result == expected
+
+def test_car_cdr2():
+    result = run_script([
+        "(define a (cons (cons 1 2) (cons 3 (cons 4 5))))",
+        "(car a)",
+        "(cdr a)",
+    ])
+
+    expected = [
+        'clisp> [VOID]',
+        'clisp> (1 2)',
+        'clisp> (3 (4 5))',
+        'clisp> ',
+    ]
+    assert result == expected
+

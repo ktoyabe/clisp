@@ -1,0 +1,12 @@
+(
+    (define a (cons (cons 1 2) (cons 3 (cons 4 5))))
+    (print a)
+    (print (car a))
+    (print (cdr a))
+    (define b (cons 1 (cons 2 3)))
+    (print (car b))
+    (print (cdr b))
+    (define c (cons 1 2))
+    (print (car c))
+    (print (cdr c))
+)
